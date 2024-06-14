@@ -1,0 +1,15 @@
+# CHANGELOG
+
+## 0.1.0
+
+3D map of voxel in .voxelmap format (read and save) and voxelMap class
+Can create random point cloud and voxelise it.
+Can create voxel map from sin func to have approximation of a real map.
+
+Can apply fft to map and store it in a fftMap class.
+Can apply ifft to fftMap.
+Can apply low pass filter to fftMap.
+
+WIP:
+Reduce memory size of fftMap by removing the blank part of the fft.
+Reconstruct the full fftMap from the reduced one.

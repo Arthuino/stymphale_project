@@ -31,9 +31,7 @@
 *.out
 *.app
 
-# Python pycache
+# Python
 __pycache__/
-
-# Python env
-voxenv/
+env/
 
