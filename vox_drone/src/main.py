@@ -24,9 +24,11 @@ def main():
     map = mapper.create_voxelMap_from_sinfunc([15,30,20], 1)
 
     map.plot3D()
+
+    map2 = mapper.read_voxelMap_from_file("data/sinfuncmap2.voxmap")
+    map2.plot3D()
     plt.show()
 
-    mapper.save_voxelMap_to_file(map, "data/sinfuncmap2.voxmap")
     
 
     

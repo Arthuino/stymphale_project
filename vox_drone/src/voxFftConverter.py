@@ -21,7 +21,7 @@ class voxFftConverter:
         
         Args:
             voxelMap (VoxelMap): the VoxelMap to convert
-            compression_ratio :  filter_size = map_size/compression_ratio. Defaults to 3. max value : 2
+            compression_ratio :  filter_size = map_size/compression_ratio. Defaults to 3. min value : 2
 
         Returns:
             FftMap: the compressed fft of the VoxelMap
@@ -29,7 +29,9 @@ class voxFftConverter:
 
         fft3Dmap = np.fft.fftn(voxelMap.get_voxelMap()) # compute the 3D fft of the VoxelMap
 
-        filter_size = (int)(fft3Dmap.shape[0]//compression_ratio)
+        filter_size = tuple(int(dim_size // compression_ratio) for dim_size in fft3Dmap.shape)
+        print("filter_size", filter_size)
+
 
         fft3DmapFiltered = voxFftConverter.fft_lowpass_filter(fft3Dmap, filter_size) # apply a low pass filter on the fft
 
@@ -64,12 +66,12 @@ class voxFftConverter:
     
 
     @staticmethod
-    def filtrage(spectre, n):
+    def filtrage(spectre, filter_size):
         """Remove high frequency components of a 3D fft
 
         Args:
             spectre (np.array): the 3D fft
-            n (int): the compression value
+            
 
         Returns:
             np.array: the filtered 3D fft
@@ -82,8 +84,11 @@ class voxFftConverter:
         # TODO: marche très bien pour un cube, mais dois être généralisé 
 
         # Copy the interior of spectre into the zero-filled array
-        zeros[n:-n, n:-n, n:-n] = spectre[n:-n, n:-n, n:-n]
-
+        zeros[filter_size[0]:-filter_size[0],
+                filter_size[1]:-filter_size[1],
+                filter_size[2]:-filter_size[2]] = spectre[filter_size[0]:-filter_size[0],
+                                                            filter_size[1]:-filter_size[1],
+                                                            filter_size[2]:-filter_size[2]]
         # Replace spectre with the zero-filled array
         spectre = zeros
 
@@ -125,22 +130,22 @@ class voxFftConverter:
 
         # Slice and append along the first axis
         fftMapCompressed = np.append(
-            fftMapFiltered[:fftMapFiltered.shape[0]//2-size_filter, :, :],
-            fftMapFiltered[fftMapFiltered.shape[0]//2+size_filter:, :, :],
+            fftMapFiltered[:fftMapFiltered.shape[0]//2-size_filter[0], :, :],
+            fftMapFiltered[fftMapFiltered.shape[0]//2+size_filter[0]:, :, :],
             axis=0
         )
 
         # Slice and append along the second axis
         fftMapCompressed = np.append(
-            fftMapCompressed[:, :fftMapCompressed.shape[1]//2-size_filter, :],
-            fftMapCompressed[:, fftMapCompressed.shape[1]//2+size_filter:, :],
+            fftMapCompressed[:, :fftMapCompressed.shape[1]//2-size_filter[1], :],
+            fftMapCompressed[:, fftMapCompressed.shape[1]//2+size_filter[1]:, :],
             axis=1
         )
 
         # Slice and append along the third axis
         fftMapCompressed = np.append(
-            fftMapCompressed[:, :, :fftMapCompressed.shape[2]//2-size_filter],
-            fftMapCompressed[:, :, fftMapCompressed.shape[2]//2+size_filter:],
+            fftMapCompressed[:, :, :fftMapCompressed.shape[2]//2-size_filter[2]],
+            fftMapCompressed[:, :, fftMapCompressed.shape[2]//2+size_filter[2]:],
             axis=2
         )
 
@@ -154,9 +159,9 @@ class voxFftConverter:
     def _compute_filter_decompression(fft3DmapCompressed:np.array, filter_size:int)->np.array:
 
         # compute shape of the original fft
-        original_shape = ((int)(fft3DmapCompressed.shape[0] + 2*filter_size),
-                                (int)(fft3DmapCompressed.shape[1]+ 2*filter_size),
-                                (int)(fft3DmapCompressed.shape[2]+ 2*filter_size))
+        original_shape = ((int)(fft3DmapCompressed.shape[0] + 2*filter_size[0]),
+                                (int)(fft3DmapCompressed.shape[1]+ 2*filter_size[1]),
+                                (int)(fft3DmapCompressed.shape[2]+ 2*filter_size[2]))
         print("original_shape", original_shape)
         print("fft3DmapCompressed.shape", fft3DmapCompressed.shape)
         print("size_filter decompress", filter_size)
@@ -169,7 +174,9 @@ class voxFftConverter:
         
         #fft3Dmap[size_filter:fft3Dmap.shape[0]-size_filter, size_filter:fft3Dmap.shape[1]-size_filter, size_filter:fft3Dmap.shape[2]-size_filter] = fft3DmapCompressed
         # put the compressed fft in the center of the new fft, exept for the third axis where it has to be outside
-        fft3Dmap[filter_size:fft3Dmap.shape[0]-filter_size, filter_size:fft3Dmap.shape[1]-filter_size, filter_size:fft3Dmap.shape[2]-filter_size] = fft3DmapCompressed
+        fft3Dmap[filter_size[0]:fft3Dmap.shape[0]-filter_size[0], 
+                 filter_size[1]:fft3Dmap.shape[1]-filter_size[1],
+                   filter_size[2]:fft3Dmap.shape[2]-filter_size[2]] = fft3DmapCompressed
 
         fft3Dmap = np.fft.ifftshift(fft3Dmap) # shift the zero frequency component to the center
 
@@ -282,11 +289,10 @@ def testfullConversionLoop(plot):
     """Test the compression and decompression of a VoxelMap
     """
     mapper = VoxelMapCreator()
-    #voxmap = mapper.create_voxelMap_from_sinfunc(50, 1)
-    voxmap = mapper.read_voxelMap_from_file("data/test1.voxmap")
+    voxmap = mapper.read_voxelMap_from_file("data/sinfuncmap2.voxmap")
 
 
-    fftmap = voxFftConverter.vox_fft_conversion(voxmap,3)
+    fftmap = voxFftConverter.vox_fft_conversion(voxmap,4)
 
     ifft_vox_map = voxFftConverter.fft_vox_conversion(fftmap)
 

@@ -17,10 +17,10 @@ class VoxelMapCreator:
             
             matrix = np.zeros((size[0], size[1], size[2])).astype(int)
             # Read the values of the matrix
-            for i in range(size[2]):
+            for i in range(size[0]):
                 for j in range(size[1]):
                     line = file.readline().split()
-                    for k in range(size[0]):
+                    for k in range(size[2]):
                         matrix[i][j][k] = int(line[k])
                 file.readline()
         size = matrix.shape*voxel_size
