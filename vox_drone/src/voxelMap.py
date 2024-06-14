@@ -13,51 +13,7 @@ class VoxelMap:
         return
 
 
-    def read_voxelMap_from_file(self, file_path):
-        "Read a 3D matrix from a .voxmap file"
-        
-        with open(file_path, 'r') as file:
-            # Read the size of the matrix
-            size = file.readline().split()
-            size = [int(i) for i in size]
-            
-            matrix = np.zeros((size[0], size[1], size[2])).astype(int)
-            # Read the values of the matrix
-            for i in range(size[2]):
-                for j in range(size[1]):
-                    line = file.readline().split()
-                    for k in range(size[0]):
-                        matrix[i][j][k] = int(line[k])
-                file.readline()
-        size = matrix.shape*self.voxel_size
-        voxel_map = np.repeat(
-                            np.repeat(
-                                np.repeat(matrix, self.voxel_size, axis=0),
-                                         self.voxel_size, axis=1),
-                                          self.voxel_size, axis=2)
-        self._data = voxel_map
-        return self
-
     
-    def save_voxelMap_to_file(self, file_path):
-        "Write a 3D matrix to a file, considering the voxel size."
-        # Create a 3D matrix
-        # .voxmap file format
-        # The first line is the size of the matrix : X, Y, Z
-        # The next lines are the values of the matrix
-        # 0 = empty, other = full
-
-        # step 1 : reduce the size of the matrix
-        matrix = self._data[::self.voxel_size, ::self.voxel_size, ::self.voxel_size]
-        with open(file_path, 'w') as file:
-            file.write(str(matrix.shape[0]) + " " + str(matrix.shape[1]) + " " + str(matrix.shape[2]) + "\n")
-            for i in range(matrix.shape[0]):
-                for j in range(matrix.shape[1]):
-                    for k in range(matrix.shape[2]):
-                        file.write(str(matrix[i][j][k]) + " ")
-                    file.write("\n")
-                file.write("\n")
-        return
 
 
     def plot3D(self, title = "Voxel Map"):

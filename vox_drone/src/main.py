@@ -14,41 +14,22 @@ import numpy as np
 import matplotlib.pyplot as plt
 from voxelMap import VoxelMap
 from mapCreator import VoxelMapCreator
-from voxCompressor import VoxCompressor
+from voxFftConverter import voxFftConverter
 
 
 def main():
     print("VOX Drone Project")
     print("Developement test program")
-    testFullCompressionProcess()
-
-    
-
-
-def testFullCompressionProcess():
     mapper = VoxelMapCreator()
-    testsize = 20
+    map = mapper.create_voxelMap_from_sinfunc([15,30,20], 1)
 
-    #map1.read_voxelMap_from_file("data/cloud1.voxmap")
-    #map1 = mapper.create_voxelMap_from_sinfunc(testsize, 1)
-    map1 = mapper.voxelise_3Dcloud(mapper.create_test_cloud([10, 10, 10], [3, 5, 8], 500), 1)
-
-    print("fft compression")
-    fftmap1 = VoxCompressor.fft_compression(map1)
-    print("fft decompression")
-    ifftmap1 = VoxCompressor.fft_decompression(fftmap1)
-
-    print("plot")
-    map1.plot3D("Original")
-    ifftmap1.plot3D("IFFT")
-
-    map1.save_voxelMap_to_file("data/cloud1.voxmap")
-    
-    VoxCompressor.layerPlotFFT3(map1, fftmap1, ifftmap1)
+    map.plot3D()
     plt.show()
 
+    mapper.save_voxelMap_to_file(map, "data/sinfuncmap2.voxmap")
     
 
+    
 
 if __name__ == '__main__':
     main()

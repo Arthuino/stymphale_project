@@ -282,10 +282,11 @@ def testfullConversionLoop(plot):
     """Test the compression and decompression of a VoxelMap
     """
     mapper = VoxelMapCreator()
-    testsize = 50
-    voxmap = mapper.create_voxelMap_from_sinfunc(testsize, 1)
+    #voxmap = mapper.create_voxelMap_from_sinfunc(50, 1)
+    voxmap = mapper.read_voxelMap_from_file("data/test1.voxmap")
 
-    fftmap = voxFftConverter.vox_fft_conversion(voxmap,2.5)
+
+    fftmap = voxFftConverter.vox_fft_conversion(voxmap,3)
 
     ifft_vox_map = voxFftConverter.fft_vox_conversion(fftmap)
 
