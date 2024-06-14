@@ -5,6 +5,32 @@ import matplotlib.pyplot as plt
 import sys
 
 class FftMap:
+    """This class is used to store the fft of a VoxelMap and to compress/decompress it
+
+    TODO: Change the compression value unit to something more meaningful
+
+    TODO: Fix the decompression function
+
+    TODO: Refacto code architecture
+
+    Args:
+        fft3Dmap (np.array): the fft of a VoxelMap
+        compression_value (int): the compression value used to compress the fft 
+
+    Attributes:
+        compression_value (int): the compression value used to compress the fft
+        _size_filter (int): the size of the filter used to compress the fft
+        _compressed_map (np.array): the compressed fft of the VoxelMap
+
+    Methods:
+        _compute_filter_compression: compute the compression of the fft
+        _compute_filter_decompression: compute the decompression of the fft
+        get_fft_map: return the decompressed fft
+        get_compress_map: return the compressed fft
+        get_voxel_map: return the decompressed fft
+        get_memory_size: return the memory size of the compressed fft
+
+    """
     def __init__(self, fft3Dmap, compression_value):
         self.compression_value = compression_value
         self._size_filter = 0
@@ -95,9 +121,16 @@ class FftMap:
         return self._compressed_map
 
     def get_voxel_map(self):
+        """Return the decompressed fft
+        """
         return self._compute_decompression()
     
     def get_memory_size(self):
+        """Return the memory size of the compressed fft
+
+        Returns:
+            int: the memory size of the compressed fft
+        """
         return self._compressed_map.nbytes
     
     
