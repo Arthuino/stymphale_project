@@ -14,22 +14,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from voxelMap import VoxelMap
 from mapCreator import VoxelMapCreator
-from voxFftConverter import voxFftConverter
+from voxFftConverter import VoxFftConverter
+from voxFftConverter import testfullConversionLoop
 
 
 def main():
-    print("VOX Drone Project")
-    print("Developement test program")
-    mapper = VoxelMapCreator()
-    map = mapper.create_voxelMap_from_sinfunc([15,30,20], 1)
-
-    map.plot3D()
-
-    map2 = mapper.read_voxelMap_from_file("data/sinfuncmap2.voxmap")
-    map2.plot3D()
-    plt.show()
-
-    
+    testfullConversionLoop(True)
 
     
 

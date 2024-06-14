@@ -7,7 +7,7 @@ from voxelMap import VoxelMap
 from fftMap import FftMap
 
 
-class voxFftConverter:
+class VoxFftConverter:
     def __init__(self):
         pass
 
@@ -27,18 +27,19 @@ class voxFftConverter:
             FftMap: the compressed fft of the VoxelMap
         """
 
+        print("compression_ratio", compression_ratio)
         fft3Dmap = np.fft.fftn(voxelMap.get_voxelMap()) # compute the 3D fft of the VoxelMap
 
         filter_size = tuple(int(dim_size // compression_ratio) for dim_size in fft3Dmap.shape)
         print("filter_size", filter_size)
 
 
-        fft3DmapFiltered = voxFftConverter.fft_lowpass_filter(fft3Dmap, filter_size) # apply a low pass filter on the fft
+        fft3DmapFiltered = VoxFftConverter.fft_lowpass_filter(fft3Dmap, filter_size) # apply a low pass filter on the fft
 
-        fft3DmapCompressed  = voxFftConverter._compute_filter_compression(fft3DmapFiltered, filter_size) # compress the fft by removing the blank space
+        fft3DmapCompressed  = VoxFftConverter._compute_filter_compression(fft3DmapFiltered, filter_size) # compress the fft by removing the blank space
 
         # Debugging
-        voxFftConverter.layerPlotFFT(fft3DmapFiltered,"Filtered FFT")
+        VoxFftConverter.layerPlotFFT(fft3DmapFiltered,"Filtered FFT")
         print("fft3DmapFiltered.shape", fft3DmapFiltered.shape)
 
         return FftMap(fft3DmapCompressed, filter_size)
@@ -55,10 +56,10 @@ class voxFftConverter:
             VoxelMap: the VoxelMap reconstructed from the fft
         """
 
-        fft3DmapF = voxFftConverter._compute_filter_decompression(fft3Dmap.get_compress_map(),
+        fft3DmapF = VoxFftConverter._compute_filter_decompression(fft3Dmap.get_compress_map(),
                                                                   fft3Dmap.get_filter_size()) # decompress the fft
 
-        voxFftConverter.layerPlotFFT(fft3DmapF,"Decompressed FFT")
+        VoxFftConverter.layerPlotFFT(fft3DmapF,"Decompressed FFT")
 
         ifft3Dmap = np.fft.ifftn(fft3DmapF)
         ifftVoxMap = VoxelMap(data = np.abs(ifft3Dmap))
@@ -111,7 +112,7 @@ class voxFftConverter:
         fft3DmapFiltered = np.copy(fft3Dmap)
 
         fft3DmapFiltered = np.fft.fftshift(fft3DmapFiltered) # shift the zero frequency component to the center
-        fft3DmapFiltered = voxFftConverter.filtrage(fft3DmapFiltered, filter_size) # remove high frequency components
+        fft3DmapFiltered = VoxFftConverter.filtrage(fft3DmapFiltered, filter_size) # remove high frequency components
         fft3DmapFiltered = np.fft.ifftshift(fft3DmapFiltered) # shift them back
 
 
@@ -276,11 +277,11 @@ def testConversion():
     testsize = 50
     voxmap = mapper.create_voxelMap_from_sinfunc(testsize, 1)
 
-    fftmap = voxFftConverter.vox_fft_conversion(voxmap)
+    fftmap = VoxFftConverter.vox_fft_conversion(voxmap)
 
-    voxFftConverter.compression_rate(voxmap, fftmap,True)
+    VoxFftConverter.compression_rate(voxmap, fftmap,True)
 
-    voxFftConverter.layerPlotFFT(fftmap.get_compress_map())
+    VoxFftConverter.layerPlotFFT(fftmap.get_compress_map())
     
     plt.show()
 
@@ -292,16 +293,16 @@ def testfullConversionLoop(plot):
     voxmap = mapper.read_voxelMap_from_file("data/sinfuncmap2.voxmap")
 
 
-    fftmap = voxFftConverter.vox_fft_conversion(voxmap,4)
+    fftmap = VoxFftConverter.vox_fft_conversion(voxmap,3)
 
-    ifft_vox_map = voxFftConverter.fft_vox_conversion(fftmap)
+    ifft_vox_map = VoxFftConverter.fft_vox_conversion(fftmap)
 
-    voxFftConverter.compression_rate(voxmap, fftmap,True)
+    VoxFftConverter.compression_rate(voxmap, fftmap,True)
 
 
     #plotting
     if plot:
-        voxFftConverter.layerPlotFFT3(voxmap, fftmap.get_compress_map(), ifft_vox_map)
+        VoxFftConverter.layerPlotFFT3(voxmap, fftmap.get_compress_map(), ifft_vox_map)
         voxmap.plot3D()
         ifft_vox_map.plot3D("IFFT Voxel Map Filtered")
         plt.show()
