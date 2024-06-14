@@ -4,11 +4,23 @@ Project of drone swarm.
 
 The purpose of this project is to test several algorithms, strategies and tools in the idea of creating a swarm of drones.
 
+The project also have a self-training goal.
+
 ## Vox_drone
 
 The purpose of the vox_drone module is to test the posibilities of using voxels instead of point cloud to represent the environment.
 The voxels indeed allow to use Fast Fourrier Transform and apply a low pass filter on the environment.
 Thanks to that, we can optains a representation of the environement with a very small memory footprint. That means we could possibly make the exange of the map between the drones faster or with a lower latency/communication frequency.
+
+### Evolutions
+
+The future perspectives of this module are :
+
+- Using a real map instead of a randomly generated one.
+- test the computation time of the FFT and the compression.
+- test of doing the compression and decompression faster, per exemple with AI.
+- quantitatives test the impact of the compression on the quality of the map (Error rate, precision, etc.)
+- precommit, hooks, documentation and refacto in the idea of making this module usable by other modules.
 
 ### Setup
 
