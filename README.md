@@ -51,3 +51,8 @@ The final result depend of the compression. The compression is currently paramet
 ![terminalscreenshotCP3](doc/v010/terminalscreenshotCP3.png "The terminal screenshot for a compression ratio of 3.")
 
 ![terminalscreenshotCP4](doc/v010/terminalscreenshotCP4.png "The terminal screenshot for a compression ratio of 4.")
+
+
+## Documentation
+
+Open3D Library : https://www.open3d.org/docs/release/index.html

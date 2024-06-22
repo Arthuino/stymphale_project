@@ -7,6 +7,7 @@ class VoxelMapCreator:
     def __init__(self):
         pass
 
+
     def read_voxelMap_from_file(self, file_path, voxel_size = 1):
         "Read a 3D matrix from a .voxmap file"
         

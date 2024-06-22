@@ -13,3 +13,13 @@ Can apply low pass filter to fftMap.
 WIP:
 Reduce memory size of fftMap by removing the blank part of the fft.
 Reconstruct the full fftMap from the reduced one.
+
+## 0.1.1
+
+Conversion voxmap <-> fftMap operational.
+Architecture of the code improved.
+
+## 0.1.2
+
+WIP:
+Implementation of Open3D for visualization and voxelization of point cloud.

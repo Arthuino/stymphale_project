@@ -10,20 +10,21 @@
 # z : depth
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-from voxelMap import VoxelMap
-from mapCreator import VoxelMapCreator
-from voxFftConverter import VoxFftConverter
+import matplotlib
+#matplotlib.use('TkAgg') # set the backend of matplotlib to TkAgg
+
+
 from voxFftConverter import testfullConversionLoop
+import open3d as o3d
 
-
-def main():
-    testfullConversionLoop(True)
-
-    
 
 if __name__ == '__main__':
-    main()
+    testfullConversionLoop(True)
+
+    #dataset = o3d.data.EaglePointCloud()
+    #pcd = o3d.io.read_point_cloud(dataset.path)
+    #o3d.visualization.draw(pcd)
+
+    
 
 
