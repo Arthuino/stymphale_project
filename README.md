@@ -21,6 +21,7 @@ The future perspectives of this module are :
 - test of doing the compression and decompression faster, per exemple with AI.
 - quantitatives test the impact of the compression on the quality of the map (Error rate, precision, etc.)
 - precommit, hooks, documentation and refacto in the idea of making this module usable by other modules.
+- data size optimization by using bit operations
 
 ### Setup
 

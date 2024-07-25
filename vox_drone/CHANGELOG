@@ -21,5 +21,11 @@ Architecture of the code improved.
 
 ## 0.1.2
 
-WIP:
+Launch from docker operational.
+
+Attempt :
 Implementation of Open3D for visualization and voxelization of point cloud.
+Issues with the visualisation due to the virtualization of the docker and/or WSL.
+
+WIP:
+Replace Open3D by PyVista

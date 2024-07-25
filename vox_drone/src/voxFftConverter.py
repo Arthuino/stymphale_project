@@ -293,7 +293,7 @@ def testfullConversionLoop(plot):
     voxmap = mapper.read_voxelMap_from_file("data/sinfuncmap2.voxmap")
 
 
-    fftmap = VoxFftConverter.vox_fft_conversion(voxmap,3)
+    fftmap = VoxFftConverter.vox_fft_conversion(voxmap,4)
 
     ifft_vox_map = VoxFftConverter.fft_vox_conversion(fftmap)
 
