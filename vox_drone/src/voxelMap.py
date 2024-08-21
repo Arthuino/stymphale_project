@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class VoxelMap:
+    """This class is used to store a 3D map of voxel/point cloud"""
+
     def __init__(self, _width = 10, _height = 10, _depth = 10, _voxel_size = 1, data = None):
         self.voxel_size = _voxel_size
 
@@ -60,7 +62,7 @@ class VoxelMap:
         self._data = np.where(self._data > threshold, 1, 0)
         return self
     
-    def get_voxelMap(self):
+    def get_voxelMap(self) -> np.ndarray:
         return self._data
     
     def set_voxelMap(self, data):
@@ -73,6 +75,8 @@ class VoxelMap:
 
     def get_memory_size(self):
         return self._data.nbytes
+    
+
 
 
 def testVoxelFile():

@@ -16,7 +16,7 @@ class VoxFftConverter:
     ############################
 
     @staticmethod
-    def vox_fft_conversion(voxelMap: VoxelMap, compression_ratio : float = 3.0) -> FftMap:
+    def vox_fft_conversion(voxelMap: VoxelMap, compression_ratio : float = 3.4, plotting : bool = False) -> FftMap:
         """Convert a VoxelMap to its fft representation and apply a low pass filter to compress it
         
         Args:
@@ -26,27 +26,23 @@ class VoxFftConverter:
         Returns:
             FftMap: the compressed fft of the VoxelMap
         """
-
-        print("compression_ratio", compression_ratio)
         fft3Dmap = np.fft.fftn(voxelMap.get_voxelMap()) # compute the 3D fft of the VoxelMap
-
         filter_size = tuple(int(dim_size // compression_ratio) for dim_size in fft3Dmap.shape)
-        print("filter_size", filter_size)
-
-
         fft3DmapFiltered = VoxFftConverter.fft_lowpass_filter(fft3Dmap, filter_size) # apply a low pass filter on the fft
-
         fft3DmapCompressed  = VoxFftConverter._compute_filter_compression(fft3DmapFiltered, filter_size) # compress the fft by removing the blank space
 
         # Debugging
-        VoxFftConverter.layerPlotFFT(fft3DmapFiltered,"Filtered FFT")
-        print("fft3DmapFiltered.shape", fft3DmapFiltered.shape)
+        if plotting:
+            print("compression_ratio", compression_ratio)
+            print("filter_size", filter_size)
+            VoxFftConverter.layerPlotFFT(fft3DmapFiltered,"Filtered FFT")
+            print("fft3DmapFiltered.shape", fft3DmapFiltered.shape)
 
         return FftMap(fft3DmapCompressed, filter_size)
     
 
     @staticmethod
-    def fft_vox_conversion(fft3Dmap: FftMap) -> VoxelMap:
+    def fft_vox_conversion(fft3Dmap: FftMap, plotting : bool = False) -> VoxelMap:
         """Convert a compressed fft to a VoxelMap
 
         Args:
@@ -59,10 +55,12 @@ class VoxFftConverter:
         fft3DmapF = VoxFftConverter._compute_filter_decompression(fft3Dmap.get_compress_map(),
                                                                   fft3Dmap.get_filter_size()) # decompress the fft
 
-        VoxFftConverter.layerPlotFFT(fft3DmapF,"Decompressed FFT")
-
         ifft3Dmap = np.fft.ifftn(fft3DmapF)
         ifftVoxMap = VoxelMap(data = np.abs(ifft3Dmap))
+
+        if plotting:
+            VoxFftConverter.layerPlotFFT(fft3DmapF,"Decompressed FFT")
+
         return ifftVoxMap.binariseMap()
     
 
@@ -125,9 +123,10 @@ class VoxFftConverter:
 
 
     @staticmethod
-    def _compute_filter_compression(fftMapFiltered: np.array, size_filter: int)->np.array:
-
-        print("size_filter compression", size_filter)
+    def _compute_filter_compression(fftMapFiltered: np.array, size_filter: int, plotting : bool = False)->np.array:
+        """Compress a filtered fft by removing the blank space"""
+        if plotting:
+            print("size_filter compression", size_filter)
 
         # Slice and append along the first axis
         fftMapCompressed = np.append(
@@ -157,15 +156,17 @@ class VoxFftConverter:
 
 
     @staticmethod
-    def _compute_filter_decompression(fft3DmapCompressed:np.array, filter_size:int)->np.array:
+    def _compute_filter_decompression(fft3DmapCompressed:np.array, filter_size:int, plotting : bool = False)->np.array:
 
         # compute shape of the original fft
         original_shape = ((int)(fft3DmapCompressed.shape[0] + 2*filter_size[0]),
                                 (int)(fft3DmapCompressed.shape[1]+ 2*filter_size[1]),
                                 (int)(fft3DmapCompressed.shape[2]+ 2*filter_size[2]))
-        print("original_shape", original_shape)
-        print("fft3DmapCompressed.shape", fft3DmapCompressed.shape)
-        print("size_filter decompress", filter_size)
+
+        if plotting:
+            print("original_shape", original_shape)
+            print("fft3DmapCompressed.shape", fft3DmapCompressed.shape)
+            print("size_filter decompress", filter_size)
 
 
         fft3Dmap = np.zeros(original_shape, dtype=fft3DmapCompressed.dtype)
@@ -182,8 +183,8 @@ class VoxFftConverter:
         fft3Dmap = np.fft.ifftshift(fft3Dmap) # shift the zero frequency component to the center
 
          
-
-        print("fft3Dmap.shape", fft3Dmap.shape)
+        if plotting:
+            print("fft3Dmap.shape", fft3Dmap.shape)
 
         return fft3Dmap
 
@@ -263,6 +264,11 @@ class VoxFftConverter:
 
         return
     
+    @staticmethod
+    def rmse_map(map1 : VoxelMap, map2: VoxelMap) -> float:
+        rmse = np.sqrt(np.mean((map1.get_voxelMap() - map2.get_voxelMap()) ** 2))
+        return rmse
+    
 
 
  
@@ -286,18 +292,22 @@ def testConversion():
     plt.show()
 
 
-def testfullConversionLoop(plot):
+def testfullConversion(plot, compression_ratio = 3.4):
     """Test the compression and decompression of a VoxelMap
     """
     mapper = VoxelMapCreator()
     voxmap = mapper.read_voxelMap_from_file("data/sinfuncmap2.voxmap")
 
 
-    fftmap = VoxFftConverter.vox_fft_conversion(voxmap,4)
+    fftmap = VoxFftConverter.vox_fft_conversion(voxmap,compression_ratio)
 
     ifft_vox_map = VoxFftConverter.fft_vox_conversion(fftmap)
 
-    VoxFftConverter.compression_rate(voxmap, fftmap,True)
+    comp_rate = VoxFftConverter.compression_rate(voxmap, fftmap,False)
+
+    rmse = VoxFftConverter.rmse_map(voxmap, ifft_vox_map)
+    
+
 
 
     #plotting
@@ -307,12 +317,36 @@ def testfullConversionLoop(plot):
         ifft_vox_map.plot3D("IFFT Voxel Map Filtered")
         plt.show()
 
+    return comp_rate,rmse
+
+def compressionRatioEvaluation():
+    
+    #compression ratios between 2 and 5 incrementing by 0.1
+    compression_ratios = np.arange(1.9, 6, 0.1)
+    comp_rates = []
+    rmses = []
+    for compression_ratio in compression_ratios:
+        comp_rate,rmse = testfullConversion(False, compression_ratio)
+        comp_rates.append(comp_rate)
+        rmses.append(rmse*100)
+    
 
 
+    #plotting
+    for i, (comp_rate, rmse) in enumerate(zip(comp_rates, rmses)):
+        print(f"Compression ratio {compression_ratios[i]} Compression rate {comp_rate:.2f} %      RMSE {rmse:.2f}")
+        print()
 
-
+    plt.plot(compression_ratios, comp_rates)
+    plt.plot(compression_ratios, rmses)
+    plt.xlabel("Compression ratio")
+    plt.ylabel("Compression rate (%) - RMSE (*100)")
+    plt.title("Compression rate as a function of the compression ratio")
+    plt.show()
 
 if __name__ == "__main__":
     #testConversion() # successful ?
 
-    testfullConversionLoop(True)
+    #testfullConversion(True)
+
+    compressionRatioEvaluation()
