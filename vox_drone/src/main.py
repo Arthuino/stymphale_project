@@ -10,20 +10,16 @@
 # z : depth
 
 
-import matplotlib
-#matplotlib.use('TkAgg') # set the backend of matplotlib to TkAgg
-
-
 from voxFftConverter import testfullConversionLoop
-import open3d as o3d
 
+from pyvista import examples
 
 if __name__ == '__main__':
     #testfullConversionLoop(False)
 
-    dataset = o3d.data.EaglePointCloud()
-    pcd = o3d.io.read_point_cloud(dataset.path)
-    #o3d.visualization.draw(pcd)
+    mesh = examples.download_dragon()
+    mesh['scalars'] = mesh.points[:, 1]
+    mesh.plot(cpos='xy', cmap='plasma')
 
     
 

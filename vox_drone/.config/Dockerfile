@@ -18,7 +18,11 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Open3D from the PyPI repositories
-RUN python3 -m pip install --no-cache-dir --upgrade pip numpy matplotlib open3d
+RUN python3 -m pip install --no-cache-dir --upgrade pip \
+                                                    numpy \
+                                                    matplotlib \
+                                                    open3d \
+                                                    pyvista[all]
 
 
 RUN mkdir -p /app
