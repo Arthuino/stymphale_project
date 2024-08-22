@@ -40,8 +40,8 @@ def pointcloudTest():
 
 
 if __name__ == '__main__':
-    testfullConversion(True)
-    #pointcloudTest()
+    #testfullConversion(True)
+    pointcloudTest()
 
     
 
