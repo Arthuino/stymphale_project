@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from mapCreator import VoxelMapCreator
 from voxelMap import VoxelMap
 from fftMap import FftMap
-
+import pyvista as pv
+from main import pyvista_example_points_cloud
 
 class VoxFftConverter:
     def __init__(self):
@@ -298,6 +299,9 @@ def testfullConversion(plot, compression_ratio = 3.4):
     mapper = VoxelMapCreator()
     voxmap = mapper.read_voxelMap_from_file("data/sinfuncmap2.voxmap")
 
+    voxmap = VoxelMapCreator().voxelise_3Dcloud(pyvista_example_points_cloud(),1)
+
+
 
     fftmap = VoxFftConverter.vox_fft_conversion(voxmap,compression_ratio)
 
@@ -312,9 +316,17 @@ def testfullConversion(plot, compression_ratio = 3.4):
 
     #plotting
     if plot:
-        VoxFftConverter.layerPlotFFT3(voxmap, fftmap.get_compress_map(), ifft_vox_map)
-        voxmap.plot3D()
-        ifft_vox_map.plot3D("IFFT Voxel Map Filtered")
+        #VoxFftConverter.layerPlotFFT3(voxmap, fftmap.get_compress_map(), ifft_vox_map)
+
+        pc = VoxelMapCreator().voxel_to_point_cloud(voxmap)
+        pv_pc = pv.PolyData(pc)
+        pv_pc.plot(eye_dome_lighting=True)
+        #voxmap.plot3D()
+
+        #ifft_vox_map.plot3D("IFFT Voxel Map Filtered")
+        pc = VoxelMapCreator().voxel_to_point_cloud(ifft_vox_map)
+        pv_pc = pv.PolyData(pc)
+        pv_pc.plot(eye_dome_lighting=True)
         plt.show()
 
     return comp_rate,rmse
@@ -347,6 +359,6 @@ def compressionRatioEvaluation():
 if __name__ == "__main__":
     #testConversion() # successful ?
 
-    #testfullConversion(True)
+    print(testfullConversion(True, 5))
 
-    compressionRatioEvaluation()
+    #compressionRatioEvaluation()

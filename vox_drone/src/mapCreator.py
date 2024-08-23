@@ -4,8 +4,50 @@ import matplotlib.pyplot as plt
 from voxelMap import VoxelMap
 
 class VoxelMapCreator:
+    """This class is used to simulate data of 3D maps"""
+
     def __init__(self):
         pass
+
+
+    def voxelise_3Dcloud(self, cloud : np.array, voxel_size : int) -> VoxelMap:
+        # create a voxel map from a cloud of points
+        # cloud : 3D numpy array
+        # voxel_size : int
+        # return : VoxelMap
+        # The voxel map is a 3D matrix where each voxel is a cube of size voxel_size
+        # The value of the voxel is 0 if the voxel is empty and 1 if the voxel is full
+        
+        # get the size of the voxel map
+        min = np.floor(np.min(cloud, axis=0)).astype(int)
+        max = np.ceil(np.max(cloud, axis=0) + 1).astype(int)
+
+        print("max axis 0", max)
+        print("min axis 0", min)
+        size = (max - min).astype(int)
+        print("size", size)
+
+        voxel_map = VoxelMap(size[0], size[1], size[2], voxel_size)
+        cloud = cloud - min
+        # fill the voxel map
+        for point in cloud:
+            voxel_map.set_voxel(point, 1)
+        
+        return voxel_map
+    
+    def voxel_to_point_cloud(self, voxel_map : VoxelMap, dtype = np.float32) -> np.array:
+        # convert a voxel map to a cloud of points
+        # voxel_map : VoxelMap
+        # return : 3D numpy array
+        # The cloud of points is a 3D numpy array where each point is the center of a voxel
+        
+        cloud = []
+        for i in range(voxel_map.width):
+            for j in range(voxel_map.height):
+                for k in range(voxel_map.depth):
+                    if voxel_map._data_voxel_map[i][j][k] == 1:
+                        cloud.append([i, j, k])
+        return np.array(cloud).astype(dtype)
 
 
     def read_voxelMap_from_file(self, file_path, voxel_size = 1):
@@ -62,23 +104,7 @@ class VoxelMapCreator:
         z = np.random.randint(center[2] - size[2], center[2] + size[2], num_points)
         return np.column_stack((x, y, z))
     
-    def voxelise_3Dcloud(self, cloud, voxel_size):
-        # create a voxel map from a cloud of points
-        # cloud : 3D numpy array
-        # voxel_size : int
-        # return : VoxelMap
-        # The voxel map is a 3D matrix where each voxel is a cube of size voxel_size
-        # The value of the voxel is 0 if the voxel is empty and 1 if the voxel is full
-        
-        # get the size of the voxel map
-        size = np.max(cloud, axis=0) + 1
-        voxel_map = VoxelMap(size[0], size[1], size[2], voxel_size)
-        
-        # fill the voxel map
-        for point in cloud:
-            voxel_map.set_voxel(point, 1)
-        
-        return voxel_map
+    
 
 
     def create_voxelMap_from_sinfunc(self, size : Tuple[int,int,int], voxel_size) -> VoxelMap:

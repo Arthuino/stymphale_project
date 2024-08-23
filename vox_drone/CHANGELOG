@@ -24,5 +24,13 @@ Architecture of the code improved.
 Launch from docker operational.
 Error rate computation for maps
 
+## 0.1.3
+
+At this point, the ideal library for this project should be open3D. Considering the systematic segfaults of all open3D functions, I supposed that the library is not compatible with the docker image. None of the others libraries I tried satisfied my needs. So I will wait the futur C++ implementation to turn my self to libs. I will focus the python version on the proof of concept.
+
+EDIT: I will keep PYvista for the visualization of the point cloud.
+
+The 0.1.3 version will focus on evaluating tool of the runtime and memory usage and using a "use case" point cloud.
+
 WIP:
-Implementation of PyVista for visualization and voxelization of point cloud ?
+OPtimize/subdivide voxelization.

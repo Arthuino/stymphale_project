@@ -23,7 +23,8 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip \
                                                     matplotlib \
                                                     open3d \
                                                     pyvista[all] \
-                                                    PVGeo
+                                                    PVGeo \
+                                                    open3d
 
 
 RUN mkdir -p /app

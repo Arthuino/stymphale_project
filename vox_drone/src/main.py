@@ -9,43 +9,41 @@
 # y : vertical
 # z : depth
 
-
-from voxFftConverter import testfullConversion
+#from voxFftConverter import testfullConversion
+from mapCreator import VoxelMapCreator
+import matplotlib.pyplot as plt
 
 import numpy as np
 import pyvista as pv
 from pyvista import examples
 
 
-
-# Define some helpers - ignore these and use your own data if you like!
-def generate_points(subset=0.02):
+def pyvista_example_points_cloud(subset=0.02): #TODO change to directly give voxel map and migrate to mapCreator.py
     """A helper to make a 3D NumPy array of points (n_points by 3)."""
-    # Columns are (X, Y, Z)
     dataset = examples.download_lidar()
     ids = np.random.randint(low=0, high=dataset.n_points - 1, size=int(dataset.n_points * subset))
     return dataset.points[ids]
 
 
-def pointcloudTest():
-    points = generate_points()
-    # PyVista conversion
-    point_cloud = pv.PolyData(points)
-    print("point cloud conversion check : ",np.allclose(points, point_cloud.points))
-
-    # Plotting
-    point_cloud.plot(eye_dome_lighting=True)
-
-
 
 
 if __name__ == '__main__':
-    #testfullConversion(True)
-    pointcloudTest()
+    points = pyvista_example_points_cloud()
+
+    #get voxel map from pyvista example
+    voxel_map = VoxelMapCreator().voxelise_3Dcloud(pyvista_example_points_cloud(),1)
 
     
+    #get point cloud from voxel map
+    pc = VoxelMapCreator().voxel_to_point_cloud(voxel_map)
+    #print(pc.shape)
+    #print(pc)
+
+    pv_pc = pv.PolyData(pc)
+    pv_pc.plot(eye_dome_lighting=True)
 
 
-    
+
+
 
 
