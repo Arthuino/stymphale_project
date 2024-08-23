@@ -54,6 +54,14 @@ The final result depend of the compression. The compression is currently paramet
 ![terminalscreenshotCP4](doc/v010/terminalscreenshotCP4.png "The terminal screenshot for a compression ratio of 4.")
 
 
+## Zawardo_drone
+
+The purpose of the zawardo_drone module is to create a gazebo simulation of drone fleet that fit my need to test the other modules in a near use case simulation.
+
+It is based on https://github.com/monemati/multiuav-gazebo-simulation.
+
 ## Documentation
 
 Open3D Library : https://www.open3d.org/docs/release/index.html
+
+Gazebo simulation for zawardo : https://github.com/monemati/multiuav-gazebo-simulation
