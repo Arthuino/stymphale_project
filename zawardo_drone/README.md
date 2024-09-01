@@ -52,3 +52,26 @@ MAVROS
 roslaunch mavros px4.launch fcu_url:=tcp://localhost:5760
 ```
 
+## Docker zawardo
+
+build
+
+```bash
+./.config/docker_build.sh
+```
+
+run
+
+```bash
+./.config/docker_run.sh
+```
+
+check dependencies
+
+```bash
+su ardupilotuser
+ardupilot/Tools/environment_install/install-prereqs-ubuntu.sh -y
+su root
+```
+
+root password inside docker : zawardo
