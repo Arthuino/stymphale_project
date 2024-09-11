@@ -78,7 +78,7 @@ RUN git clone -b master --recurse-submodules https://github.com/ArduPilot/Micro-
     && cd dds-gen \
     && ./gradlew assemble
 
-FROM main-setup
+FROM main-setup as arm-dds-setup
 
 WORKDIR /dds-gen
 COPY --from=dds-gen-builder /dds-gen/scripts scripts/
@@ -91,6 +91,7 @@ ARG ARM_ROOT_EXT="-2020-q4-major"
 ARG ARM_TARBALL="$ARM_ROOT$ARM_ROOT_EXT-x86_64-linux.tar.bz2"
 ARG ARM_TARBALL_URL="https://firmware.ardupilot.org/Tools/STM32-tools/$ARM_TARBALL"
 
+# ---- ARM Toolchain ----
 RUN cd /opt \
 	&& wget -qO- "$ARM_TARBALL_URL" | tar jx \
 	&& mv "/opt/$ARM_ROOT$ARM_ROOT_EXT" "/opt/$ARM_ROOT" \
@@ -119,48 +120,61 @@ ENV BUILDLOGS=/tmp/buildlogs
 
 ENV TZ=UTC
 
+
+
+FROM arm-dds-setup as ardupilot-setup
 # ---- CUSTOM SETUP ----
+# ---- User setup ----
+RUN useradd -ms /bin/bash ardupilotuser \
+    && echo "ardupilotuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-# ---- ROS Tools for Ardupilot ----
+RUN usermod -aG dialout ardupilotuser
+RUN echo 'root:zawardo' | chpasswd
 
-RUN mkdir -p ~/ros2_ws/src && cd ~/ros2_ws && \
-    vcs import --recursive --input https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos src
+ENV APPIMAGE_EXTRACT_AND_RUN=1
 
-WORKDIR ~/ros2_ws
+WORKDIR /home/ardupilotuser
 
-RUN mkdir src
 
-# Rosdep dependencies
-RUN apt update \
-    && rosdep update
+# ---- Gazebo ----
 
-RUN /bin/bash -c "source /opt/ros/humble/setup.bash && rosdep install --from-paths src --ignore-src -y"
+RUN apt-get update && apt-get install -y curl \
+    && curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+
+RUN apt-get update \
+    && apt-get install -y gz-harmonic
+
+# ---- ROS2 workspace init ----
+RUN mkdir -p ros2_ws/src
+
+# ---- Ardupilot ----
+RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos --recursive ros2_ws/src
+
+# ---- GAZEBO Tools for Ardupilot ----
+RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot_gz/main/ros2_gz.repos --recursive ros2_ws/src
+ENV GZ_VERSION=harmonic
+
 
 # ---- MAVProxy ----
 RUN pip install -U MAVProxy
 
-# ---- Build ros2_ws ----
-RUN colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
-
-WORKDIR /~/
 
 # ---- Ardupilot ----
-RUN git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
+#USER ardupilotusers
+#RUN git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
+#RUN echo "export PATH=$PATH:/~/ardupilot/Tools/autotest" >> ~/.bashrc
 
-RUN echo "export PATH=$PATH:/~/ardupilot/Tools/autotest" >> ~/.bashrc
+
+# ---- Build ros2_ws ----
+
+#RUN colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 # ---- Tools ----
+
 RUN apt install -y terminator \
                     nano \
                     iproute2
-
-
-# ---- Gazebo ----
-RUN apt-get update && apt-get install -y curl \
-    && curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null \
-    && apt-get update \
-    && apt-get install -y gz-harmonic
 
 # ---- QGroundControl ----
 # Install QGroundControl dependencies (gstreamer, pulseaudio)
@@ -176,16 +190,8 @@ RUN apt-get update && apt-get install -y \
 RUN wget https://s3-us-west-2.amazonaws.com/qgroundcontrol/latest/QGroundControl.AppImage
 RUN chmod +x QGroundControl.AppImage
 
+# ---- Final check for updates ----
+RUN apt-get update && apt-get upgrade -y
 
-# ---- User setup ----
-RUN useradd -ms /bin/bash ardupilotuser \
-    && echo "ardupilotuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
-RUN usermod -aG dialout ardupilotuser
-
-RUN echo 'root:zawardo' | chpasswd
-
-
-USER ardupilotuser
-RUN echo "export APPIMAGE_EXTRACT_AND_RUN=1" >> ~/.bashrc
-
+# ---- Permissions ----
+RUN chown -R ardupilotuser:ardupilotuser /home/ardupilotuser
