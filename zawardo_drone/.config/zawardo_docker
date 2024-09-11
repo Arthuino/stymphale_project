@@ -135,40 +135,27 @@ ENV APPIMAGE_EXTRACT_AND_RUN=1
 
 WORKDIR /home/ardupilotuser
 
-
-# ---- Gazebo ----
-
-RUN apt-get update && apt-get install -y curl \
-    && curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-
-RUN apt-get update \
-    && apt-get install -y gz-harmonic
-
-# ---- ROS2 workspace init ----
-RUN mkdir -p ros2_ws/src
-
-# ---- Ardupilot ----
-RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos --recursive ros2_ws/src
-
-# ---- GAZEBO Tools for Ardupilot ----
-RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot_gz/main/ros2_gz.repos --recursive ros2_ws/src
-ENV GZ_VERSION=harmonic
-
-
 # ---- MAVProxy ----
 RUN pip install -U MAVProxy
 
-
 # ---- Ardupilot ----
-#USER ardupilotusers
-#RUN git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
-#RUN echo "export PATH=$PATH:/~/ardupilot/Tools/autotest" >> ~/.bashrc
+# ROS2 workspace init
+RUN mkdir -p ros2_ws/src
+WORKDIR /home/ardupilotuser/ros2_ws
+# Clone
+RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos --recursive src
+# Update dependencies
+RUN apt-get update
+USER ardupilotuser
+RUN rosdep update && rosdep install --from-paths src --ignore-src -y 
+USER root
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+# Build
+SHELL ["/bin/bash", "-c"]
+RUN . /opt/ros/humble/setup.bash && colcon build --symlink-install
 
 
-# ---- Build ros2_ws ----
 
-#RUN colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 # ---- Tools ----
 

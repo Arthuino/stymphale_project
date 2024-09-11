@@ -75,3 +75,13 @@ su root
 ```
 
 root password inside docker : zawardo
+
+### Test install
+
+Ardupilot + ROS
+
+```bash
+source ./install/setup.bash
+colcon test --executor sequential --parallel-workers 0 --base-paths src/ardupilot --event-handlers=console_cohesion+
+colcon test-result --all --verbose
+```
