@@ -154,11 +154,17 @@ RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 SHELL ["/bin/bash", "-c"]
 RUN . /opt/ros/humble/setup.bash && colcon build --symlink-install
 
+# ---- Gazabo Harmonic ----
+# Install Tools
+RUN apt-get update && apt-get install lsb-release gnupg curl -y
+# Install
+RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+RUN apt-get update && apt-get install gz-harmonic -y
 
 
 
 # ---- Tools ----
-
 RUN apt install -y terminator \
                     nano \
                     iproute2
