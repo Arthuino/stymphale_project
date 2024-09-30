@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM ros:humble-ros-base as main-setup
+FROM ros:humble-ros-base AS main-setup
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -38,47 +38,47 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 # TAKEN from https://github.com/docker-library/python/blob/a58630aef106c8efd710011c6a2a0a1d551319a0/3.11/bullseye/Dockerfile
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 23.1.2
+ENV PYTHON_PIP_VERSION=23.1.2
 # https://github.com/docker-library/python/issues/365
-ENV PYTHON_SETUPTOOLS_VERSION 65.5.1
+ENV PYTHON_SETUPTOOLS_VERSION=65.5.1
 # https://github.com/pypa/get-pip
-ENV PYTHON_GET_PIP_URL https://github.com/pypa/get-pip/raw/9af82b715db434abb94a0a6f3569f43e72157346/public/get-pip.py
-ENV PYTHON_GET_PIP_SHA256 45a2bb8bf2bb5eff16fdd00faef6f29731831c7c59bd9fc2bf1f3bed511ff1fe
+ENV PYTHON_GET_PIP_URL=https://github.com/pypa/get-pip/raw/9af82b715db434abb94a0a6f3569f43e72157346/public/get-pip.py
+ENV PYTHON_GET_PIP_SHA256=45a2bb8bf2bb5eff16fdd00faef6f29731831c7c59bd9fc2bf1f3bed511ff1fe
 
 RUN set -eux; \
-	\
-	wget -O get-pip.py "$PYTHON_GET_PIP_URL"; \
-	echo "$PYTHON_GET_PIP_SHA256 *get-pip.py" | sha256sum -c -; \
-	\
-	export PYTHONDONTWRITEBYTECODE=1; \
-	\
-	python get-pip.py \
-		--disable-pip-version-check \
-		--no-cache-dir \
-		--no-compile \
-		"pip==$PYTHON_PIP_VERSION" \
-		"setuptools==$PYTHON_SETUPTOOLS_VERSION" \
-	; \
-	rm -f get-pip.py; \
-	\
-	pip --version
+\
+wget -O get-pip.py "$PYTHON_GET_PIP_URL"; \
+echo "$PYTHON_GET_PIP_SHA256 *get-pip.py" | sha256sum -c -; \
+\
+export PYTHONDONTWRITEBYTECODE=1; \
+\
+python get-pip.py \
+    --disable-pip-version-check \
+    --no-cache-dir \
+    --no-compile \
+    "pip==$PYTHON_PIP_VERSION" \
+    "setuptools==$PYTHON_SETUPTOOLS_VERSION" \
+; \
+rm -f get-pip.py; \
+\
+pip --version
 
 RUN python -m pip install --no-cache-dir -U future lxml pexpect flake8 empy==3.3.4 pyelftools tabulate pymavlink pre-commit junitparser
 
-FROM eclipse-temurin:19-jdk-jammy as dds-gen-builder
+FROM eclipse-temurin:19-jdk-jammy AS dds-gen-builder
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
-    git \
-    && apt-get clean \
-    && apt-get -y autoremove \
-    && apt-get autoclean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+git \
+&& apt-get clean \
+&& apt-get -y autoremove \
+&& apt-get autoclean \
+&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN git clone -b master --recurse-submodules https://github.com/ArduPilot/Micro-XRCE-DDS-Gen.git --depth 1 --no-single-branch --branch master dds-gen \
-    && cd dds-gen \
-    && ./gradlew assemble
+&& cd dds-gen \
+&& ./gradlew assemble
 
-FROM main-setup as arm-dds-setup
+FROM main-setup AS arm-dds-setup
 
 WORKDIR /dds-gen
 COPY --from=dds-gen-builder /dds-gen/scripts scripts/
@@ -93,19 +93,19 @@ ARG ARM_TARBALL_URL="https://firmware.ardupilot.org/Tools/STM32-tools/$ARM_TARBA
 
 # ---- ARM Toolchain ----
 RUN cd /opt \
-	&& wget -qO- "$ARM_TARBALL_URL" | tar jx \
-	&& mv "/opt/$ARM_ROOT$ARM_ROOT_EXT" "/opt/$ARM_ROOT" \
-	&& rm -rf "/opt/$ARM_ROOT/share/doc"
+&& wget -qO- "$ARM_TARBALL_URL" | tar jx \
+&& mv "/opt/$ARM_ROOT$ARM_ROOT_EXT" "/opt/$ARM_ROOT" \
+&& rm -rf "/opt/$ARM_ROOT/share/doc"
 
 # manual ccache setup for arm-none-eabi-g++/arm-none-eabi-gcc
 RUN ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-g++ \
-	&& ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-gcc
+&& ln -s /usr/bin/ccache /usr/lib/ccache/arm-none-eabi-gcc
 
 # Set STM32 toolchain to the PATH
 ENV PATH="/opt/$ARM_ROOT/bin:$PATH"
 
 RUN mkdir -p $HOME/arm-gcc \
-    && ln -s -f /opt/gcc-arm-none-eabi-10/ g++-10.2.1
+&& ln -s -f /opt/gcc-arm-none-eabi-10/ g++-10.2.1
 
 
 ENV PATH="/dds-gen/scripts:$PATH"
@@ -122,11 +122,29 @@ ENV TZ=UTC
 
 
 
-FROM arm-dds-setup as ardupilot-setup
+FROM arm-dds-setup AS qgroundcontrol-setup
+# ---- QGroundControl ----
+# Install QGroundControl dependencies (gstreamer, pulseaudio)
+RUN apt-get update && apt-get install -y \
+gstreamer1.0-plugins-base \
+gstreamer1.0-plugins-good \
+gstreamer1.0-plugins-bad \
+gstreamer1.0-plugins-ugly \
+gstreamer1.0-libav \
+gstreamer1.0-gl \
+libpulse-mainloop-glib0
+
+RUN wget https://s3-us-west-2.amazonaws.com/qgroundcontrol/latest/QGroundControl.AppImage
+RUN chmod +x QGroundControl.AppImage
+
+
+
+FROM qgroundcontrol-setup AS ardupilot-setup
 # ---- CUSTOM SETUP ----
+SHELL ["/bin/bash", "-c"]
 # ---- User setup ----
 RUN useradd -ms /bin/bash ardupilotuser \
-    && echo "ardupilotuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+&& echo "ardupilotuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 RUN usermod -aG dialout ardupilotuser
 RUN echo 'root:zawardo' | chpasswd
@@ -151,9 +169,12 @@ RUN rosdep update && rosdep install --from-paths src --ignore-src -y
 USER root
 RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 # Build
-SHELL ["/bin/bash", "-c"]
-RUN . /opt/ros/humble/setup.bash && colcon build --symlink-install
+RUN . /opt/ros/humble/setup.bash \
+&& colcon build --symlink-install --event-handlers console_cohesion+
 
+
+
+FROM ardupilot-setup AS ardupilot-gz-setup
 # ---- Gazabo Harmonic ----
 # Install Tools
 RUN apt-get update && apt-get install lsb-release gnupg curl -y
@@ -162,26 +183,39 @@ RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyri
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
 RUN apt-get update && apt-get install gz-harmonic -y
 
+# ---- Ardupilot_GZ ----
+# additional dependencies
+RUN apt-get update && apt install -y \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libopencv-dev \
+    openssh-client
+# Cloning
+RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot_gz/main/ros2_gz.repos --recursive src
+
+#RUN git clone git@github.com:ArduPilot/ardupilot_gz.git src/ardupilot_gz
+ENV GZ_VERSION=harmonic
+# Update ROS dependencies (/!\ rosdep don't run as root)
+RUN . /opt/ros/humble/setup.bash \
+    && apt update
+
+USER ardupilotuser
+RUN rosdep update \
+    && rosdep install --from-paths src --ignore-src -r -y
+USER root
 
 
+# Build
+#RUN . /opt/ros/humble/setup.bash \
+#    && colcon build --symlink-install --event-handlers console_cohesion+
+
+
+
+FROM ardupilot-gz-setup AS final-setup
 # ---- Tools ----
 RUN apt install -y terminator \
                     nano \
                     iproute2
-
-# ---- QGroundControl ----
-# Install QGroundControl dependencies (gstreamer, pulseaudio)
-RUN apt-get update && apt-get install -y \
-    gstreamer1.0-plugins-base \
-    gstreamer1.0-plugins-good \
-    gstreamer1.0-plugins-bad \
-    gstreamer1.0-plugins-ugly \
-    gstreamer1.0-libav \
-    gstreamer1.0-gl \
-    libpulse-mainloop-glib0
-
-RUN wget https://s3-us-west-2.amazonaws.com/qgroundcontrol/latest/QGroundControl.AppImage
-RUN chmod +x QGroundControl.AppImage
 
 # ---- Final check for updates ----
 RUN apt-get update && apt-get upgrade -y
