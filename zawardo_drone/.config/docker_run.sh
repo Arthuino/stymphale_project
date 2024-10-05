@@ -4,7 +4,6 @@ xhost +local:*
 
 docker run -it --rm \
             --name zawardo-docker \
-            --gpus all \
             --privileged \
             --net host \
             --ipc host \
