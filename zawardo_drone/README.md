@@ -24,9 +24,9 @@ SITL (Software In The Loop) simulation of an Ardupilot drone.
 The console option give MAVROS logs in a separate terminal with more infos.
 The out option give a TCP connection to the drone (usefull for QGroundControl).
 The map option give a map to give order to the drone (can "repalce" QGC)
-The build of this cmd will create files where it is called.
+- This cmd will create files where it is called.
 ```bash
-sim_vehicle.py -v [VEHICULE] -f [FRAME] -I0 --console --out=tcpin:[IP]:[PORT]
+sim_vehicle.py -v [VEHICULE] -f [FRAME] -I0 --console --map --out=tcpin:[IP]:[PORT]
 sim_vehicle.py -v ArduCopter -f gazebo-iris -I0 --console --map --out=tcpin:0.0.0.0:8100
 ```
 

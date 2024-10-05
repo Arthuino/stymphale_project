@@ -163,6 +163,7 @@ USER root
 RUN . /opt/ros/humble/setup.bash \
   && colcon build --symlink-install --event-handlers console_cohesion+
 
+RUN cd .. && mkdir sitl_build && cd sitl_build && ../ros2_ws/src/ardupilot/Tools/autotest/sim_vehicle.py -v Copter
 
 
 FROM ardupilot-setup AS ardupilot-gz-setup
