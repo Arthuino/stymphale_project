@@ -131,7 +131,10 @@ RUN ./QGroundControl.AppImage --appimage-extract
 
 FROM arm-dds-setup AS extended-arm-dds-setup
 # ---- CUSTOM SETUP ----
-    SHELL ["/bin/bash", "-c"]
+SHELL ["/bin/bash", "-c"]
+
+# Global export
+RUN echo "export PATH=\$PATH:\$HOME/.local/bin" >> ~/.bashrc
 
 # ---- User setup ----
 RUN useradd -ms /bin/bash ardupilotuser && \
@@ -143,7 +146,7 @@ WORKDIR /home/ardupilotuser
 
 
 FROM extended-arm-dds-setup AS ardupilot-setup
-
+USER ardupilotuser
 # ---- MAVProxy ----
 RUN pip install -U MAVProxy
 
@@ -154,52 +157,99 @@ WORKDIR /home/ardupilotuser/ros2_ws
 # Clone
 RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos --recursive src
 # Update dependencies
-RUN apt-get update
-USER ardupilotuser
+RUN sudo apt-get update
+
 RUN rosdep update && rosdep install --from-paths src --ignore-src -y
 RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
-USER root
+
 # Build
 RUN . /opt/ros/humble/setup.bash \
-  && colcon build --symlink-install --event-handlers console_cohesion+
+    && colcon build --symlink-install --event-handlers console_cohesion+
 
-RUN cd .. && mkdir sitl_build && cd sitl_build && ../ros2_ws/src/ardupilot/Tools/autotest/sim_vehicle.py -v Copter
+
 
 
 FROM ardupilot-setup AS ardupilot-gz-setup
 # ---- Gazabo Harmonic ----
 # Install Tools
-RUN apt-get update && apt-get install lsb-release gnupg curl -y
+RUN sudo apt-get update && sudo apt-get install lsb-release gnupg curl -y
 # Install
-RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+RUN sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-RUN apt-get update && apt-get install gz-harmonic -y
+
+
+RUN sudo wget https://raw.githubusercontent.com/osrf/osrf-rosdep/master/gz/00-gazebo.list -O /etc/ros/rosdep/sources.list.d/00-gazebo.list
+
+RUN sudo apt-get update && sudo apt-get install ros-humble-ros-gzharmonic -y
+
+
+RUN rosdep update && rosdep resolve gz-harmonic
+ENV GZ_VERSION=harmonic
 
 # ---- Ardupilot_GZ ----
 # additional dependencies
-RUN apt-get update && apt install -y \
+RUN sudo apt-get update && sudo apt install -y \
     libgstreamer1.0-dev \
     libgstreamer-plugins-base1.0-dev \
     libopencv-dev \
-    openssh-client
+    openssh-client 
 # Cloning
 RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot_gz/main/ros2_gz.repos --recursive src
-
+RUN git clone -b $ROS_DISTRO https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
 #RUN git clone git@github.com:ArduPilot/ardupilot_gz.git src/ardupilot_gz
-ENV GZ_VERSION=harmonic
+
+
 # Update ROS dependencies (/!\ rosdep don't run as root)
 RUN . /opt/ros/humble/setup.bash \
-    && apt update
+    && sudo apt update \
+    && sudo apt upgrade -y \
+    && rosdep update \
+    && sudo rosdep install --from-paths src --ignore-src -r -y
 
-USER ardupilotuser
-RUN rosdep update \
-    && rosdep install --from-paths src --ignore-src -r -y
-USER root
+# Build micro ros setup
+RUN . /opt/ros/humble/setup.bash \
+    && . install/setup.bash \
+    && colcon build --symlink-install \
+                    --event-handlers console_cohesion+ console_direct+ \
+                    --packages-select micro_ros_setup
 
+# Build execpt broken pkgs
+RUN . /opt/ros/humble/setup.bash \
+    && . install/setup.bash \
+    && colcon build --symlink-install \
+                    #--event-handlers console_cohesion+ console_direct+ \
+                    --packages-skip ardupilot_gz_bringup \
+                                    ros_gz_image \
+                                    ros_ign_bridge \
+                                    test_ros_gz_bridge \
+                                    ros_gz_bridge \
+                                    ros_gz_sim_demos \
+                                    ros_ign_image \
+                                    ros_gz \
+                                    ros_ign_gazebo_demos \
+                                    ros_ign
 
-# Build
-#RUN . /opt/ros/humble/setup.bash \
-#    && colcon build --symlink-install --event-handlers console_cohesion+
+# Update ROS dependencies (/!\ rosdep don't run as root)
+RUN . /opt/ros/humble/setup.bash \
+    && sudo apt update \
+    && rosdep update \
+    && sudo rosdep install --from-paths src --ignore-src -r -y
+
+# Build ardupilot gz
+# RUN . /opt/ros/humble/setup.bash \
+#    && . install/setup.bash \
+#    && colcon build --symlink-install \
+#                    --event-handlers console_cohesion+ \
+#                    --packages-up-to ardupilot_gz_bringup
+
+RUN sudo pip install -U MAVProxy
+
+RUN cd .. && mkdir sitl_build && cd sitl_build && ../ros2_ws/src/ardupilot/Tools/autotest/sim_vehicle.py -v Copter
+
+# debug : . .config/docker_build.sh ardupilot-gz-setup
+#           colcon build --event-handlers console_cohesion+ --packages-skip ros_gz_bridge
+# colcon build --symlink-install --event-handlers console_cohesion+ console_direct+ --packages-skip ros_gz_bridge
+# colcon build --symlink-install --event-handlers console_cohesion+ console_direct+ --packages-select ros_gz_bridge
 
 FROM extended-arm-dds-setup AS final-setup
 # ###   FINAL SETUP ### #
@@ -228,7 +278,11 @@ RUN apt-get update && apt-get install -y \
     libxcb-image0 \
     libxcb-render-util0 \
     libxcb-xinerama0 \
-    libxcb-keysyms1
+    libxcb-keysyms1 \
+    libcanberra-gtk-module \
+    libcanberra-gtk3-module
+
+
 # SITL modules depedencie
 RUN apt install python3-wxgtk4.0 -y --no-install-recommends
 USER ardupilotuser

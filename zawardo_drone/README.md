@@ -20,6 +20,10 @@ ou
 roslaunch ardupilot_gazebo ardupilot.launch
 ```
 
+```bash
+ros2 launch ardupilot_sitl sitl_mavproxy.launch.py console:=True map:=True
+```
+
 SITL (Software In The Loop) simulation of an Ardupilot drone.
 The console option give MAVROS logs in a separate terminal with more infos.
 The out option give a TCP connection to the drone (usefull for QGroundControl).
