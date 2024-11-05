@@ -120,6 +120,8 @@ ENV BUILDLOGS=/tmp/buildlogs
 
 ENV TZ=UTC
 
+ENV ROS_DISTRO=humble
+
 
 FROM arm-dds-setup AS qgroundcontrol-setup
 # ---- QGroundControl ----
@@ -183,8 +185,10 @@ RUN sudo wget https://raw.githubusercontent.com/osrf/osrf-rosdep/master/gz/00-ga
 RUN sudo apt-get update && sudo apt-get install ros-humble-ros-gzharmonic -y
 
 
-RUN rosdep update && rosdep resolve gz-harmonic
+RUN rosdep update
 ENV GZ_VERSION=harmonic
+ENV ROS_DISTRO=humble
+ENV ROS_PYTHON_VERSION=3
 
 # ---- Ardupilot_GZ ----
 # additional dependencies
@@ -195,7 +199,7 @@ RUN sudo apt-get update && sudo apt install -y \
     openssh-client 
 # Cloning
 RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot_gz/main/ros2_gz.repos --recursive src
-RUN git clone -b $ROS_DISTRO https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
+RUN git clone -b humble https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
 #RUN git clone git@github.com:ArduPilot/ardupilot_gz.git src/ardupilot_gz
 
 
@@ -204,18 +208,22 @@ RUN . /opt/ros/humble/setup.bash \
     && sudo apt update \
     && sudo apt upgrade -y \
     && rosdep update \
-    && sudo rosdep install --from-paths src --ignore-src -r -y
+    && rosdep install --from-paths src --ignore-src -r -y
 
 # Build micro ros setup
-RUN . /opt/ros/humble/setup.bash \
-    && . install/setup.bash \
-    && colcon build --symlink-install \
-                    --event-handlers console_cohesion+ console_direct+ \
-                    --packages-select micro_ros_setup
+#RUN . /opt/ros/humble/setup.bash \
+#    && . install/setup.bash \
+#    && colcon build --symlink-install \
+#                    --event-handlers console_cohesion+ console_direct+ \
+#                    --packages-select micro_ros_setup
 
 # Build execpt broken pkgs
 RUN . /opt/ros/humble/setup.bash \
     && . install/setup.bash \
+    && sudo apt update \
+    && sudo apt upgrade -y \
+    && rosdep update \
+    && sudo rosdep install --rosdistro humble --from-paths src --ignore-src -r -y \
     && colcon build --symlink-install \
                     #--event-handlers console_cohesion+ console_direct+ \
                     --packages-skip ardupilot_gz_bringup \
@@ -235,12 +243,15 @@ RUN . /opt/ros/humble/setup.bash \
     && rosdep update \
     && sudo rosdep install --from-paths src --ignore-src -r -y
 
+ENV MAKEFLAGS="-j 1"
+
 # Build ardupilot gz
-# RUN . /opt/ros/humble/setup.bash \
-#    && . install/setup.bash \
-#    && colcon build --symlink-install \
-#                    --event-handlers console_cohesion+ \
-#                    --packages-up-to ardupilot_gz_bringup
+RUN . /opt/ros/humble/setup.bash \
+    && . install/setup.bash \
+    && colcon build --symlink-install \
+                    --parallel-workers=1 --executor sequential \
+                    --event-handlers console_cohesion+ \
+                    --packages-up-to ardupilot_gz_bringup
 
 RUN sudo pip install -U MAVProxy
 
@@ -296,4 +307,5 @@ RUN echo "alias qgroundcontrol-start='bash /qgroundcontrol/qgroundcontrol-start.
 COPY --chown=ardupilotuser --from=ardupilot-gz-setup /home/ardupilotuser/ros2_ws /home/ardupilotuser/ros2_ws
 RUN echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc && \
     echo "export PATH=\$PATH:/home/ardupilotuser/ros2_ws/src/ardupilot/Tools/autotest/" >> ~/.bashrc
-
+WORKDIR /home/ardupilotuser/ros2_ws
+RUN rosdep update && rosdep install --from-paths src --ignore-src -r -y
