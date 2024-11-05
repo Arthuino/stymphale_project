@@ -308,4 +308,21 @@ COPY --chown=ardupilotuser --from=ardupilot-gz-setup /home/ardupilotuser/ros2_ws
 RUN echo "source ~/ros2_ws/install/setup.bash" >> ~/.bashrc && \
     echo "export PATH=\$PATH:/home/ardupilotuser/ros2_ws/src/ardupilot/Tools/autotest/" >> ~/.bashrc
 WORKDIR /home/ardupilotuser/ros2_ws
+
 RUN rosdep update && rosdep install --from-paths src --ignore-src -r -y
+
+# Install dependencies and gazebo
+RUN sudo apt-get update && sudo apt-get install lsb-release gnupg curl -y \
+    && sudo curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null \
+    && sudo wget https://raw.githubusercontent.com/osrf/osrf-rosdep/master/gz/00-gazebo.list -O /etc/ros/rosdep/sources.list.d/00-gazebo.list
+
+
+RUN sudo apt-get update && sudo apt install -y \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libopencv-dev \
+    openssh-client \
+    ros-humble-ros-gzharmonic 
+
+

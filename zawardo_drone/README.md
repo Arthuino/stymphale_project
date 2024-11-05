@@ -90,3 +90,23 @@ source ./install/setup.bash
 colcon test --executor sequential --parallel-workers 0 --base-paths src/ardupilot --event-handlers=console_cohesion+
 colcon test-result --all --verbose
 ```
+
+
+### Usage
+
+Launch mavproxy and sitl
+```bash
+ros2 launch ardupilot_sitl sitl_mavproxy.launch.py console:=True map:=True
+```
+Launch sitl + mavproxy + gazebo +rviz
+```bash
+ros2 launch ardupilot_gz_bringup iris_runway.launch.py
+```
+
+Gazebo alone 
+```bash
+gz sim
+```
+
+QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-ardupilotuser'
+libEGL warning: failed to open /dev/dri/renderD128: Permission denied
