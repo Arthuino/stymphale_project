@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the Docker image name and tag
-IMAGE_NAME="zawardo_drone"
+IMAGE_NAME="arthuino/stymphale-zawardo"
 IMAGE_TAG="latest"
 CONFIG_DIR="./.config"
 TARGET="$1"

@@ -11,7 +11,7 @@ docker run -it --rm \
             -e DISPLAY=$DISPLAY \
             -v /tmp/.X11-unix:/tmp/.X11-unix \
             -v /dev/dri/card0:/dev/dri/card0 \
-            zawardo_drone:latest
+            arthuino/stymphale-zawardo:latest
             
 xhost -local:*
 
