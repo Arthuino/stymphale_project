@@ -146,31 +146,12 @@ WORKDIR /home/ardupilotuser
 
 # TODO merge ardupilot setup and ardupilot gz setup
 
-FROM extended-arm-dds-setup AS ardupilot-setup
-USER ardupilotuser
-# ---- MAVProxy ----
-RUN pip install -U MAVProxy
-
+FROM extended-arm-dds-setup AS ardupilot-gz-setup
 # ---- Ardupilot ----
-# ROS2 workspace init
+USER ardupilotuser
 RUN mkdir -p ros2_ws/src
 WORKDIR /home/ardupilotuser/ros2_ws
-# Clone
-RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos --recursive src
-# Update dependencies
-RUN sudo apt-get update
 
-RUN rosdep update && rosdep install --from-paths src --ignore-src -y
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
-
-# Build
-RUN . /opt/ros/humble/setup.bash \
-    && colcon build --symlink-install --event-handlers console_cohesion+
-
-
-
-
-FROM ardupilot-setup AS ardupilot-gz-setup
 # ---- Gazabo Harmonic ----
 RUN sudo apt-get update \
     # Install Tools
@@ -194,14 +175,17 @@ RUN sudo apt-get update \
                 libgstreamer1.0-dev \
                 libgstreamer-plugins-base1.0-dev \
                 libopencv-dev \
-                openssh-client 
+                openssh-client \
+    && pip install -U MAVProxy
+
 # Cloning
 RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot_gz/main/ros2_gz.repos --recursive src \
-    && git clone -b humble https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
+    && vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos --recursive src \
+    && git clone -b humble https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup \
+    && git clone -b humble https://github.com/ArduPilot/ardupilot_ros.git src/ardupilot_ros
 
 # Build ardupilot gz
 RUN . /opt/ros/humble/setup.bash \
-    && . install/setup.bash \
     && sudo apt-get update \
     && sudo apt-get upgrade -y \
     && rosdep update \
@@ -212,6 +196,7 @@ RUN . /opt/ros/humble/setup.bash \
 
 # Pre build sitl
 RUN sudo pip install -U MAVProxy \
+#    && . install/setup.bash \
     && cd .. \
     && mkdir sitl_build \
     && cd sitl_build \

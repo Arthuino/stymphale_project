@@ -87,6 +87,12 @@ Launch ros2 + sitl + mavproxy + gazebo + rviz
 ros2 launch ardupilot_gz_bringup iris_runway.launch.py
 ```
 
+QGroundControl
+
+```bash
+qgroundcontrol-start
+```
+
 Gazebo alone
 
 ```bash
@@ -99,8 +105,20 @@ Connect Mavproxy console to running SITL
 mavproxy.py --console --map --aircraft test --master=:14550
 ```
 
-QGroundControl
+Control the drone in mavproxy
 
 ```bash
-qgroundcontrol-start
+velocity x y z
+```
+
+SLAM - maze simu
+
+```bash
+ros2 launch ardupilot_gz_bringup iris_maze.launch.py
+```
+
+SLAM - cartographer
+
+```bash
+ros2 launch ardupilot_ros cartographer.launch.py
 ```
