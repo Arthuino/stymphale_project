@@ -10,7 +10,7 @@ QGroundControl software
 qgroundcontrol-start
 ```
 
-SITL with ros2
+SITL with ros2 and gazebo
 
 ```bash
 ros2 launch ardupilot_sitl sitl_mavproxy.launch.py console:=True map:=True
@@ -36,19 +36,31 @@ Click one the map to set waypoints.
 
 ## Docker zawardo
 
-build
+Pull
 
 ```bash
-./.config/docker_build.sh
+docker pull arthuino/stymphale-zawardo:latest
 ```
 
-run
+Run
 
 ```bash
 ./.config/docker_run.sh
 ```
 
-root password inside docker : zawardo
+Build
+
+```bash
+./.config/docker_build.sh
+```
+
+Push
+
+```bash
+docker push arthuino/stymphale-zawardo:latest
+```
+
+root password inside docker : ``zawardo``
 
 ### Usage
 
