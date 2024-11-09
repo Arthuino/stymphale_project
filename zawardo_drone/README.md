@@ -122,3 +122,9 @@ SLAM - cartographer
 ```bash
 ros2 launch ardupilot_ros cartographer.launch.py
 ```
+
+save map
+
+```bash
+ros2 run nav2_map_server map_saver_cli
+```
