@@ -6,7 +6,8 @@ from mapCreator import VoxelMapCreator
 from voxelMap import VoxelMap
 from fftMap import FftMap
 import pyvista as pv
-from main import pyvista_example_points_cloud
+from complex32 import Complex32
+#from main import pyvista_example_points_cloud
 
 class VoxFftConverter:
     def __init__(self):
@@ -31,6 +32,7 @@ class VoxFftConverter:
         filter_size = tuple(int(dim_size // compression_ratio) for dim_size in fft3Dmap.shape)
         fft3DmapFiltered = VoxFftConverter.fft_lowpass_filter(fft3Dmap, filter_size) # apply a low pass filter on the fft
         fft3DmapCompressed  = VoxFftConverter._compute_filter_compression(fft3DmapFiltered, filter_size) # compress the fft by removing the blank space
+        fft3DmapCompressed32 = VoxFftConverter.typeCompression(fft3DmapCompressed)
 
         # Debugging
         if plotting:
@@ -39,7 +41,7 @@ class VoxFftConverter:
             VoxFftConverter.layerPlotFFT(fft3DmapFiltered,"Filtered FFT")
             print("fft3DmapFiltered.shape", fft3DmapFiltered.shape)
 
-        return FftMap(fft3DmapCompressed, filter_size)
+        return FftMap(fft3DmapCompressed32, filter_size)
     
 
     @staticmethod
@@ -52,7 +54,7 @@ class VoxFftConverter:
         Returns:
             VoxelMap: the VoxelMap reconstructed from the fft
         """
-
+        fft3Dmap = VoxFftConverter.typeDecompression(fft3Dmap)
         fft3DmapF = VoxFftConverter._compute_filter_decompression(fft3Dmap.get_compress_map(),
                                                                   fft3Dmap.get_filter_size()) # decompress the fft
 
@@ -192,6 +194,22 @@ class VoxFftConverter:
 
 
 
+    @staticmethod
+    def typeCompression(fftMap64:FftMap):
+        """FftMaps are created with complex64 type (two float32).
+        Convert to custom complex32 type (two float16)"""
+        return np.vectorize(Complex32.complex64_to_complex32)(fftMap64)
+
+    @staticmethod
+    def typeDecompression(fftMap32):
+        return np.vectorize(Complex32.complex32_to_complex64)(fftMap32)
+
+
+
+
+
+
+
 
     @staticmethod
     def compression_rate(voxelMap: VoxelMap, fftMap:FftMap , printing:bool=False) -> float:
@@ -299,7 +317,7 @@ def testfullConversion(plot, compression_ratio = 3.4):
     mapper = VoxelMapCreator()
     voxmap = mapper.read_voxelMap_from_file("data/sinfuncmap2.voxmap")
 
-    voxmap = VoxelMapCreator().voxelise_3Dcloud(pyvista_example_points_cloud(),1)
+    #voxmap = VoxelMapCreator().voxelise_3Dcloud(pyvista_example_points_cloud(),1)
 
 
 
@@ -359,6 +377,12 @@ def compressionRatioEvaluation():
 if __name__ == "__main__":
     #testConversion() # successful ?
 
-    print(testfullConversion(True, 5))
+    #print(testfullConversion(True, 5))
 
     #compressionRatioEvaluation()
+
+    mapper = VoxelMapCreator()
+    testsize = 50
+    voxmap = mapper.create_voxelMap_from_sinfunc(testsize, 1)
+
+    fftmap = VoxFftConverter.vox_fft_conversion(voxmap)

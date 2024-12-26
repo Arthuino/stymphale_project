@@ -4,7 +4,6 @@ xhost +local:*
 
 docker run -it --rm \
             --gpus all \
-            -v /home/arthuino/stymphale_project/vox_drone:/app/vox_drone \
             --privileged \
             --net host \
             --ipc host \
@@ -13,6 +12,7 @@ docker run -it --rm \
             -e MESA_LOADER_DRIVER_OVERRIDE=llvmpipe \
             -v /tmp/.X11-unix:/tmp/.X11-unix \
             -v /dev/dri/card0:/dev/dri/card0 \
+            -v /home/arthuino/stymphale_project/vox_drone:/app/vox_drone \
             vox_drone:latest
             
 xhost -local:*

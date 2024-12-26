@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the Docker image name and tag
-IMAGE_NAME="vox_drone"
+IMAGE_NAME="arthuino/stymphale-vox_drone"
 IMAGE_TAG="latest"
 
 # Build the Docker image
