@@ -1,5 +1,25 @@
 # ZAWARDO_DRONE
 
+The purpose of the zawardo_drone module is to create a docker environement for drone swarm simulation.
+The environement include :
+
+- Gazebo Harmonic
+- ROS2 Humble
+- Ardupilot
+- SITL (Ardupilot Software In The Loop)
+- Ardupilot ROS2 and Gazebo bridge
+- QGRoundControl
+- MAVPROXY
+
+And some other tools like :
+
+- terminator
+- vim
+-nano
+- git
+
+<https://ardupilot.org/dev/docs/ros2-sitl.html>
+
 ## Taking in hand Ardupilot/MAVROS
 
 ### Launch basic simulation
@@ -67,12 +87,13 @@ root password inside docker : ``zawardo``
 SITL (Software In The Loop) simulation of an Ardupilot drone.
 The console option give MAVROS logs in a separate terminal with more infos.
 The out option give a TCP connection to the drone (usefull for QGroundControl).
-The map option give a map to give order to the drone (can "repalce" QGC)
+The map option give a map to give order to the drone (can "replace" QGC)
 This cmd will create files where it is called.
 
 ```bash
 sim_vehicle.py -v [VEHICULE] -f [FRAME] -I0 --console --map --out=tcpin:[IP]:[PORT]
-sim_vehicle.py -v ArduCopter -f gazebo-iris -I0 --console --map --out=tcpin:0.0.0.0:8100
+sim_vehicle.py -v ArduCopter -f gazebo-iris -I0 --console --map --out=tcpin:0.0.0.0:8100 
+sim_vehicle.py -w -v ArduCopter -f gazebo-iris -I0 -DG --enable-dds --console --map --out=tcpin:0.0.0.0:8100 
 ```
 
 SITL launch trough ros2
@@ -99,7 +120,7 @@ Gazebo alone
 gz sim
 ```
 
-Connect Mavproxy console to running SITL
+Connect Mavproxy console to already running SITL
 
 ```bash
 mavproxy.py --console --map --aircraft test --master=:14550
@@ -128,3 +149,8 @@ save map
 ```bash
 ros2 run nav2_map_server map_saver_cli
 ```
+
+## Future improvements
+
+- Fix ROS2-MAVLINK bridge
+- Improve portability (volumes)
