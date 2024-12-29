@@ -151,3 +151,5 @@ gz sim
 ## Future improvements
 
 - Improve portability (volumes)
+
+- Test waypoints and mission planning with ROS2 services and nodes
