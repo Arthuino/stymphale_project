@@ -15,26 +15,77 @@ And some other tools like :
 
 - terminator
 - vim
--nano
+- nano
 - git
 
 <https://ardupilot.org/dev/docs/ros2-sitl.html>
 
-## Taking in hand Ardupilot/MAVROS
+## How to use
 
-### Launch basic simulation
+### Docker environement
 
-QGroundControl software
-
-```bash
-qgroundcontrol-start
-```
-
-SITL with ros2 and gazebo
+Pull the docker image :
 
 ```bash
-ros2 launch ardupilot_sitl sitl_mavproxy.launch.py console:=True map:=True
+docker pull arthuino/stymphale-zawardo:latest
 ```
+
+Run the docker :
+
+```bash
+./.config/docker_run.sh
+```
+
+### Run simulation
+
+In the seperate docker terminals :
+
+1. Run Micro-ROS agent : \
+-p specify the udp port used
+
+    ```bash
+    ros2 run micro_ros_agent micro_ros_agent udp4 -p 2019
+    ```
+
+2. Run the SITL, either with ```sim_vehicle``` or trough ROS2, without or with Gazebo :
+
+    a. with ```sim_vehicle``` :
+
+    ```bash
+    sim_vehicle.py -w -v [VEHICULE] -f [FRAME] -DG --enable-dds -I[SITL instance ID] --out=tcpin:[IP]:[PORT] --console --map
+    ```
+
+    Example with ArduCopter :
+
+    ```bash
+    sim_vehicle.py -w -v ArduCopter -f gazebo-iris -DG --enable-dds -I0 --out=tcpin:0.0.0.0:8100  --console --map
+    ```
+
+    b. with ROS2 launch :
+
+    ```bash
+    ros2 launch ardupilot_sitl sitl_mavproxy.launch.py console:=True map:=True
+    ```
+
+    c. with ROS2 launch and Gazebo :
+
+    ```bash
+    ros2 launch ardupilot_gz_bringup iris_runway.launch.py
+    ```
+
+3. Launch QGroundControl if you wish to use it : \
+Create a new connection in Application Settings>Comm Links \
+Give a name, set type to TCP and set the drone IP and port (ex: 8100)
+
+    ```bash
+    qgroundcontrol-start
+    ```
+
+4. Connect a MAVPROXY console to already running SITL simulation :
+
+    ```bash
+    mavproxy.py --console --map --aircraft test --master=:14550
+    ```
 
 ### Basic takeoff and control
 
@@ -47,34 +98,43 @@ arm throttle
 takeoff 10
 ```
 
-### QGroundControl
-
-Create a new connection in Application Settings>Comm Links
-Give a name, set type to TCP and set the drone IP and port (8100).
-
-Click one the map to set waypoints.
-
-## Docker zawardo
-
-Pull
+Control the drone in mavproxy
 
 ```bash
-docker pull arthuino/stymphale-zawardo:latest
+velocity x y z
 ```
 
-Run
+### Built-in SLAM and navigation tools
 
-```bash
-./.config/docker_run.sh
-```
+- Maze simulation in Gazebo. \
+Include a simple maze and a drone with a 2D Lidar.
 
-Build
+    ```bash
+    ros2 launch ardupilot_gz_bringup iris_maze.launch.py
+    ```
+
+- SLAM cartographer \
+Create a map based on the lidar data.
+
+    ```bash
+    ros2 launch ardupilot_ros cartographer.launch.py
+    ```
+
+    save map of the cartographer
+
+    ```bash
+    ros2 run nav2_map_server map_saver_cli -f /path/to/directory/map_name
+    ```
+
+## Other Useful Commands
+
+Build docker image
 
 ```bash
 ./.config/docker_build.sh
 ```
 
-Push
+Push docker image
 
 ```bash
 docker push arthuino/stymphale-zawardo:latest
@@ -82,75 +142,12 @@ docker push arthuino/stymphale-zawardo:latest
 
 root password inside docker : ``zawardo``
 
-### Usage
-
-SITL (Software In The Loop) simulation of an Ardupilot drone.
-The console option give MAVROS logs in a separate terminal with more infos.
-The out option give a TCP connection to the drone (usefull for QGroundControl).
-The map option give a map to give order to the drone (can "replace" QGC)
-This cmd will create files where it is called.
-
-```bash
-sim_vehicle.py -v [VEHICULE] -f [FRAME] -I0 --console --map --out=tcpin:[IP]:[PORT]
-sim_vehicle.py -v ArduCopter -f gazebo-iris -I0 --console --map --out=tcpin:0.0.0.0:8100 
-sim_vehicle.py -w -v ArduCopter -f gazebo-iris -I0 -DG --enable-dds --console --map --out=tcpin:0.0.0.0:8100 
-```
-
-SITL launch trough ros2
-
-```bash
-ros2 launch ardupilot_sitl sitl_mavproxy.launch.py console:=True map:=True
-```
-
-Launch ros2 + sitl + mavproxy + gazebo + rviz
-
-```bash
-ros2 launch ardupilot_gz_bringup iris_runway.launch.py
-```
-
-QGroundControl
-
-```bash
-qgroundcontrol-start
-```
-
-Gazebo alone
+Launch Gazebo alone
 
 ```bash
 gz sim
 ```
 
-Connect Mavproxy console to already running SITL
-
-```bash
-mavproxy.py --console --map --aircraft test --master=:14550
-```
-
-Control the drone in mavproxy
-
-```bash
-velocity x y z
-```
-
-SLAM - maze simu
-
-```bash
-ros2 launch ardupilot_gz_bringup iris_maze.launch.py
-```
-
-SLAM - cartographer
-
-```bash
-ros2 launch ardupilot_ros cartographer.launch.py
-```
-
-save map
-
-```bash
-ros2 run nav2_map_server map_saver_cli
-```
-
 ## Future improvements
 
-- Fix ROS2-MAVLINK bridge
 - Improve portability (volumes)
