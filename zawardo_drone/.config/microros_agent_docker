@@ -1,4 +1,0 @@
-# syntax=docker/dockerfile:1
-FROM microros/micro-ros-agent:humble AS microros-agent-setup
-# run micro-ros agent
-CMD ["ros2", "run", "micro_ros_agent", "micro_ros_agent", "udp4", "-p 2019"]

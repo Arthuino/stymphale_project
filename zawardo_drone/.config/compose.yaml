@@ -15,7 +15,13 @@ services:
       - /dev/dri:/dev/dri  # Enable GPU rendering (optional)
 
 
-  #microros_agent:
+  micro_ros_agent:
+    image: microros/micro-ros-agent:humble
+    container_name: micro_ros_agent
+    network_mode: host
+    command: udp4 -p 2019 # Specify the arguments for the container
+    stdin_open: true  # Keep stdin open for interactive mode
+    tty: true
 
   #ros_ardupilot_env:
 
