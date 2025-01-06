@@ -1,0 +1,25 @@
+services:
+  qgcontrol:
+    build:
+      context: .
+      dockerfile: qgcontrol/qgcontrol_docker
+    image: zawardo/qgcontrol:latest
+    container_name: qgcontrol
+    network_mode: host
+    environment:
+    - DISPLAY=${DISPLAY}
+    - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix  # Share X11 socket
+    devices:
+      - /dev/dri:/dev/dri  # Enable GPU rendering (optional)
+
+
+  #microros_agent:
+
+  #ros_ardupilot_env:
+
+  #dev_docker:
+
+  
+    

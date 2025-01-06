@@ -122,14 +122,7 @@ ENV TZ=UTC
 
 ENV ROS_DISTRO=humble
 
-
-FROM arm-dds-setup AS qgroundcontrol-setup
-# ---- QGroundControl ----
-# Download app image
-RUN wget https://s3-us-west-2.amazonaws.com/qgroundcontrol/latest/QGroundControl.AppImage && \
-    chmod +x QGroundControl.AppImage
-# extract
-RUN ./QGroundControl.AppImage --appimage-extract
+# -------------------------------------------------------------------------------------------------------------------
 
 FROM arm-dds-setup AS extended-arm-dds-setup
 # ---- CUSTOM SETUP ----
@@ -143,8 +136,6 @@ RUN useradd -ms /bin/bash ardupilotuser \
     && echo "export PATH=\$PATH:\$HOME/.local/bin" >> ~/.bashrc
 
 WORKDIR /home/ardupilotuser
-
-# TODO merge ardupilot setup and ardupilot gz setup
 
 FROM extended-arm-dds-setup AS ardupilot-gz-setup
 # ---- Ardupilot ----
@@ -169,9 +160,22 @@ ENV ROS_PYTHON_VERSION=3
 ENV MAKEFLAGS="-j 1"
 
 # ---- Ardupilot_GZ ----
+# ROS2 repositories
+RUN sudo apt update && \
+    sudo apt install -y software-properties-common curl gnupg && \
+    sudo add-apt-repository universe && \
+    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | sudo gpg --dearmor -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/ros2-latest.list && \
+    sudo apt update \
+    # MAVROS with dependencies and MAVProxy
+    && sudo apt install ros-humble-mavros -y --no-install-recommends \
+    && sudo wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh \
+    && sudo chmod +x install_geographiclib_datasets.sh \
+    && sudo ./install_geographiclib_datasets.sh
+
 # additional dependencies
 RUN sudo apt-get update \
-    && sudo apt-get install -y \
+    && sudo apt-get install -y --no-install-recommends \
                 libgstreamer1.0-dev \
                 libgstreamer-plugins-base1.0-dev \
                 libopencv-dev \
@@ -196,11 +200,10 @@ RUN . /opt/ros/humble/setup.bash \
 
 # Pre build sitl
 RUN sudo pip install -U MAVProxy \
-#    && . install/setup.bash \
     && cd .. \
     && mkdir sitl_build \
     && cd sitl_build \
-    && ../ros2_ws/src/ardupilot/Tools/autotest/sim_vehicle.py -v Copter
+    && ../ros2_ws/src/ardupilot/Tools/autotest/sim_vehicle.py -v Copter -DG --enable-dds
 
 FROM extended-arm-dds-setup AS final-setup
 

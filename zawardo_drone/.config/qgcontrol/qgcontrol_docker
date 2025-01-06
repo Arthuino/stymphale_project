@@ -1,0 +1,104 @@
+FROM ubuntu:20.04
+
+RUN apt-get update && \
+    apt-get install -y tzdata && \
+    ln -fs /usr/share/zoneinfo/Europe/London /etc/localtime && \
+    echo "Europe/London" > /etc/timezone && \
+    dpkg-reconfigure -f noninteractive tzdata
+# --- download ---
+RUN apt-get update && apt-get install -y --no-install-recommends \
+	wget \
+	ca-certificates \
+	&& wget https://s3-us-west-2.amazonaws.com/qgroundcontrol/latest/QGroundControl.AppImage && \
+    chmod +x QGroundControl.AppImage
+
+# --- extract ---
+RUN ./QGroundControl.AppImage --appimage-extract
+
+# install dependencies
+RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get install -y --no-install-recommends --quiet \
+	# gstreamer dependencies
+	gstreamer1.0-plugins-base \
+	gstreamer1.0-plugins-good \
+	gstreamer1.0-plugins-bad \
+	gstreamer1.0-plugins-ugly \
+	gstreamer1.0-libav \
+	gstreamer1.0-gl \
+	libpulse-mainloop-glib0 \
+	# qt dependencies
+	libatspi2.0-dev \
+	libfontconfig1-dev \
+	libfreetype-dev \
+	libglib2.0-dev \
+	libsm-dev \
+	libx11-dev \
+	libx11-xcb-dev \
+	libxcb-cursor-dev \
+	libxcb-glx0-dev \
+	libxcb-icccm4-dev \
+	libxcb-image0-dev \
+	libxcb-keysyms1-dev \
+	libxcb-present-dev \
+	libxcb-randr0-dev \
+	libxcb-render-util0-dev \
+	libxcb-render0-dev \
+	libxcb-shape0-dev \
+	libxcb-shm0-dev \
+	libxcb-sync-dev \
+	libxcb-util-dev \
+	libxcb-xfixes0-dev \
+	libxcb-xinerama0-dev \
+	libxcb-xkb-dev \
+	libxext-dev \
+	libxfixes-dev \
+	libxi-dev \
+	libxkbcommon-dev \
+	libxkbcommon-x11-dev \
+	libxrender-dev \
+	libxcomposite1 \
+	libxcursor1 \
+	libxdamage1 \
+	libxext6 \
+	libxfixes3 \
+	libxi6 \
+	libxrandr2 \
+	libxrender1 \
+	libxcb-shm0 \
+	libxcb1 \
+	libxcb-render0 \
+	libxcb-xfixes0 \
+	libxcb-randr0 \
+	libxcb-shape0 \
+	libxcb-sync1 \
+	libxcb-keysyms1 \
+	libxcb-image0 \
+	libxcb-icccm4 \
+	libxcb-xinerama0 \
+	libxcb-util1 \
+	libfontconfig1 \
+	libfreetype6 \
+	libxkbcommon-x11-0 \
+	libwayland-client0 \
+	libwayland-cursor0 \
+	libwayland-egl1 \
+	libpulse-mainloop-glib0 \
+	libatspi2.0-dev \
+	# Clean up unnecessary files and remove modemmanager
+	&& apt-get clean \
+	&& apt-get autoremove -y \
+	&& apt-get remove --purge -y modemmanager \
+	&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# fix user permissions
+RUN useradd -m -s /bin/bash myuser && \
+    echo "myuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+	mv /squashfs-root /home/myuser/squashfs-root && \
+    chown -R myuser:myuser /home/myuser/squashfs-root
+USER myuser
+
+WORKDIR /home/myuser/squashfs-root
+
+# --- run ---
+CMD ["./AppRun"]
+
+    
