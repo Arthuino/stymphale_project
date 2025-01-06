@@ -18,7 +18,8 @@ And some other tools like :
 - nano
 - git
 
-<https://ardupilot.org/dev/docs/ros2-sitl.html>
+Based on ardupilot ROS2 tutorial :
+<https://ardupilot.org/dev/docs/ros2.html>
 
 ## How to use
 
@@ -52,13 +53,13 @@ In the seperate docker terminals :
     a. with ```sim_vehicle``` :
 
     ```bash
-    sim_vehicle.py -w -v [VEHICULE] -f [FRAME] -DG --enable-dds -I[SITL instance ID] --out=tcpin:[IP]:[PORT] --console --map
+    sim_vehicle.py -w -v [VEHICULE] -DG --enable-dds --out=tcpin:[IP]:[PORT] --console --map
     ```
 
     Example with ArduCopter :
 
     ```bash
-    sim_vehicle.py -w -v ArduCopter -f gazebo-iris -DG --enable-dds -I0 --out=tcpin:0.0.0.0:8100  --console --map
+    sim_vehicle.py -w -v ArduCopter -DG --enable-dds --out=tcpin:0.0.0.0:8100  --console --map
     ```
 
     b. with ROS2 launch :
@@ -81,7 +82,7 @@ Give a name, set type to TCP and set the drone IP and port (ex: 8100)
     qgroundcontrol-start
     ```
 
-4. Connect a MAVPROXY console to already running SITL simulation :
+4. Connect a MAVPROXY console to already running SITL simulation launched with ros launch :
 
     ```bash
     mavproxy.py --console --map --aircraft test --master=:14550
@@ -150,6 +151,10 @@ gz sim
 
 ## Future improvements
 
-- Improve portability (volumes)
+- [ ] Improve portability (volumes)
 
-- Test waypoints and mission planning with ROS2 services and nodes
+- [x] Test waypoints and mission planning with ROS2 services and nodes
+
+- [ ] Add MAVROS to docker
+
+- [ ] Create separate dockers and docker-compose for each tool
