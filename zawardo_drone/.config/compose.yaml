@@ -23,7 +23,20 @@ services:
     stdin_open: true  # Keep stdin open for interactive mode
     tty: true
 
-  #ros_ardupilot_env:
+  ardupilot_ros_env:
+    build:
+      context: .
+      dockerfile: ardupilot_ros/ardupilot_ros_docker
+    image: zawardo/ardupilot_ros:latest
+    container_name: ardupilot_ros
+    network_mode: host
+    environment:
+    - DISPLAY=${DISPLAY}
+    - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix  # Share X11 socket
+    devices:
+      - /dev/dri:/dev/dri  # Enable GPU rendering (optional)
 
   #dev_docker:
 

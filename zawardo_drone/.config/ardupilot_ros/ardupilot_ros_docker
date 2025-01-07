@@ -185,7 +185,6 @@ RUN sudo apt-get update \
 # Cloning
 RUN vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot_gz/main/ros2_gz.repos --recursive src \
     && vcs import --input https://raw.githubusercontent.com/ArduPilot/ardupilot/master/Tools/ros2/ros2.repos --recursive src \
-    && git clone -b humble https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup \
     && git clone -b humble https://github.com/ArduPilot/ardupilot_ros.git src/ardupilot_ros
 
 # Build ardupilot gz
@@ -199,18 +198,16 @@ RUN . /opt/ros/humble/setup.bash \
                     --event-handlers console_cohesion+
 
 # Pre build sitl
-RUN sudo pip install -U MAVProxy \
-    && cd .. \
-    && mkdir sitl_build \
-    && cd sitl_build \
-    && ../ros2_ws/src/ardupilot/Tools/autotest/sim_vehicle.py -v Copter -DG --enable-dds
+# RUN sudo pip install -U MAVProxy \
+#    && cd .. \
+#    && mkdir sitl_build \
+#    && cd sitl_build \
+#    && ../ros2_ws/src/ardupilot/Tools/autotest/sim_vehicle.py -v Copter -DG --enable-dds
 
 FROM extended-arm-dds-setup AS final-setup
 
 # ###   FINAL SETUP ### #
 
-# --- Folders ----
-COPY --chown=ardupilotuser --from=qgroundcontrol-setup /squashfs-root /qgroundcontrol
 COPY --chown=ardupilotuser --from=ardupilot-gz-setup /home/ardupilotuser/ros2_ws /home/ardupilotuser/ros2_ws
 WORKDIR /home/ardupilotuser/ros2_ws
 
@@ -229,23 +226,6 @@ RUN sudo apt-get update \
                     gedit \
                     vim \
                     curl \
-                    # QGroundControl dependencies
-                    gstreamer1.0-plugins-base \
-                    gstreamer1.0-plugins-good \
-                    gstreamer1.0-plugins-bad \
-                    gstreamer1.0-plugins-ugly \
-                    gstreamer1.0-libav \
-                    gstreamer1.0-gl \
-                    libpulse-mainloop-glib0 \
-                    # Qt dependencies
-                    libxkbcommon-x11-dev \
-                    libxcb-icccm4 \
-                    libxcb-image0 \
-                    libxcb-render-util0 \
-                    libxcb-xinerama0 \
-                    libxcb-keysyms1 \
-                    libcanberra-gtk-module \
-                    libcanberra-gtk3-module \
                     # SITL modules depedencies
                     python3-wxgtk4.0 \
                     # ardu gz depedencies
@@ -267,14 +247,10 @@ RUN sudo apt-get update \
 
 # --- cleanning ---
 RUN sudo apt-get clean \
-    # modem manager not compatible
-    && sudo apt-get autoremove modemmanager -y \
-    && sudo apt-get -y autoremove \
-    && sudo apt-get autoclean \
-    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && rm -rf log/*
+    && sudo apt-get autoremove -y \
+    && sudo apt-get remove --purge -y modemmanager \
+    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # --- Bashrc config ---
-RUN echo "alias qgroundcontrol-start='bash /qgroundcontrol/qgroundcontrol-start.sh'" >> ~/.bashrc \
-    && echo "source /home/ardupilotuser/ros2_ws/install/setup.bash" >> ~/.bashrc \
+RUN echo "source /home/ardupilotuser/ros2_ws/install/setup.bash" >> ~/.bashrc \
     && echo "export PATH=\$PATH:/home/ardupilotuser/ros2_ws/src/ardupilot/Tools/autotest/" >> ~/.bashrc
