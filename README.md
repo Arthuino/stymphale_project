@@ -1,10 +1,10 @@
 # stymphale_project
 
-Project of drone swarm.
+The end goal of this project is to create a ROS2 package for 3D SLAM with decentralized drone swarm.
+To support this development, there severals "modules" :
 
-The purpose of this project is to test several algorithms, strategies and tools trough differents "modules", in the idea of creating a swarm of drones.
-
-The project also have a self-training goal.
+- Zawardo_drone : Docker environement for coding, test and simulation
+- Vox_drone : Python module. Experiment voxel maps possibilities
 
 ## Zawardo_drone
 

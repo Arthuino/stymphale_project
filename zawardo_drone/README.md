@@ -39,16 +39,18 @@ Run the docker :
 
 ### Run simulation
 
-In the seperate docker terminals :
-
 1. Run Micro-ROS agent : \
--p specify the udp port used
 
     ```bash
-    ros2 run micro_ros_agent micro_ros_agent udp4 -p 2019
+    docker compose up micro_ros_agent
     ```
 
-2. Run the SITL, either with ```sim_vehicle``` or trough ROS2, without or with Gazebo :
+2. Run the SITL, either with ```sim_vehicle``` or trough ROS2, without or with Gazebo : \
+    In the ardupilot environement docker :
+
+    ```bash
+    docker compose run ardupilot_ros_env
+    ```
 
     a. with ```sim_vehicle``` :
 
@@ -79,7 +81,7 @@ Create a new connection in Application Settings>Comm Links \
 Give a name, set type to TCP and set the drone IP and port (ex: 8100)
 
     ```bash
-    qgroundcontrol-start
+    docker compose up qgroundcontrol
     ```
 
 4. Connect a MAVPROXY console to already running SITL simulation launched with ros launch :
