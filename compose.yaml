@@ -1,0 +1,2 @@
+include:
+- zawardo_drone/.config/compose.yaml

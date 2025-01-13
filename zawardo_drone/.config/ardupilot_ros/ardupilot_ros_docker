@@ -166,12 +166,7 @@ RUN sudo apt update && \
     sudo add-apt-repository universe && \
     curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key | sudo gpg --dearmor -o /usr/share/keyrings/ros-archive-keyring.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/ros2-latest.list && \
-    sudo apt update \
-    # MAVROS with dependencies and MAVProxy
-    && sudo apt install ros-humble-mavros -y --no-install-recommends \
-    && sudo wget https://raw.githubusercontent.com/mavlink/mavros/ros2/mavros/scripts/install_geographiclib_datasets.sh \
-    && sudo chmod +x install_geographiclib_datasets.sh \
-    && sudo ./install_geographiclib_datasets.sh
+    sudo apt update 
 
 # additional dependencies
 RUN sudo apt-get update \

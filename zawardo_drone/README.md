@@ -49,7 +49,7 @@ Run the docker :
     In the ardupilot environement docker :
 
     ```bash
-    docker compose run ardupilot_ros_env
+    docker compose run --remove-orphans ardupilot_ros_env 
     ```
 
     a. with ```sim_vehicle``` :
@@ -129,7 +129,35 @@ Create a map based on the lidar data.
     ros2 run nav2_map_server map_saver_cli -f /path/to/directory/map_name
     ```
 
-## Other Useful Commands
+## Use AP_DDS ros services
+
+### Takeoff
+
+Switch to guided mode [doc for copter](https://mavlink.io/en/messages/ardupilotmega.html#COPTER_MODE)
+
+```bash
+ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch "mode: 4"
+```
+
+Arming motors
+
+```bash
+ros2 service call /ap/arm_motors ardupilot_msgs/srv/ArmMotors "arm: true"
+```
+
+Takeoff
+
+```bash
+ros2 service call /ap/experimental/takeoff ardupilot_msgs/srv/Takeoff "alt: 5.0"
+```
+
+Land
+
+```bash
+ros2 service call /ap/mode_switch ardupilot_msgs/srv/ModeSwitch "mode: 9"
+```
+
+## Other Useful Commands and infos
 
 Build docker image
 
@@ -143,20 +171,17 @@ Push docker image
 docker push arthuino/stymphale-zawardo:latest
 ```
 
-root password inside docker : ``zawardo``
-
 Launch Gazebo alone
 
 ```bash
 gz sim
 ```
 
+non-root user name : ``ardupilotuser`` \
+root password inside docker : ``zawardo``
+
 ## Future improvements
 
-- [ ] Improve portability (volumes)
+- [ ] Test waypoints and mission planning with ROS2 services and nodes
 
-- [x] Test waypoints and mission planning with ROS2 services and nodes
-
-- [ ] Add MAVROS to docker
-
-- [ ] Create separate dockers and docker-compose for each tool
+- [X] Create separate dockers and docker-compose for each tool
