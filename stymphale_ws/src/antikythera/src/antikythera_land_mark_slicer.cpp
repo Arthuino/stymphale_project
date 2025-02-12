@@ -20,52 +20,62 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
+
 #include <chrono>
 #include <functional>
 #include <memory>
 #include <string>
 
-#include <opencv2/core.hpp>
-#include <Eigen/Dense.hpp>
-
 #include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/header.hpp"
 #include "std_msgs/msg/string.hpp"
-
+#include "sensor_msgs/msg/point_cloud2.hpp"
+#include <opencv2/core.hpp>
 
 using namespace std::chrono_literals;
 
-/* This example creates a subclass of Node and uses std::bind() to register a
-* member function as a callback from the timer. */
-
-class MinimalPublisher : public rclcpp::Node
+class LandMarkSlicer : public rclcpp::Node
 {
 public:
-  MinimalPublisher()
-  : Node("minimal_publisher"), count_(0)
+  LandMarkSlicer()
+  : Node("landMarkSlicer")
   {
-    publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
-    timer_ = this->create_wall_timer(
-      500ms, std::bind(&MinimalPublisher::timer_callback, this));
+    subscriber_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(
+      "/antikythera/emulator/point_cloud", 10, std::bind(
+        &LandMarkSlicer::sub_callback, this, std::placeholders::_1
+    ));
   }
 
 private:
-  void timer_callback()
-  {
-    auto message = std_msgs::msg::String();
-    message.data = "Hello, world! " + std::to_string(count_++);
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr publisher_;
+  rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr subscriber_;
 
-    RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
-    publisher_->publish(message);
+  void sub_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg)
+  {
+    printf("Received point cloud\n");
+    pcl::PointCloud<pcl::PointXYZ> cloud;
+    pcl::fromROSMsg(*msg, cloud);
+    segmentation(cloud);
   }
-  rclcpp::TimerBase::SharedPtr timer_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
-  size_t count_;
+
+  void segmentation(const pcl::PointCloud<pcl::PointXYZ> fullcloud)
+  {
+    printf("Segmentation\n");
+    printf("Full cloud size: %ld\n", fullcloud.size());
+  }
 };
+
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<MinimalPublisher>());
+  auto slicer_node = std::make_shared<LandMarkSlicer>();
+
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(slicer_node);
+  executor.spin();
   rclcpp::shutdown();
   return 0;
 }

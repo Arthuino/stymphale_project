@@ -21,6 +21,8 @@
 // SOFTWARE.
 
 #include <gtest/gtest.h>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
 
 TEST(package_name, a_first_test)
 {
@@ -29,6 +31,9 @@ TEST(package_name, a_first_test)
 
 int main(int argc, char ** argv)
 {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  rclcpp::init(argc, argv);
+  ::testing::InitGoogleTest(&argc, argv);
+  auto result = RUN_ALL_TESTS();
+  rclcpp::shutdown();
+  return result;
 }

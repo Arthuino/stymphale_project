@@ -23,6 +23,8 @@ RUN apt-get update && apt-get install -y \
     libpcl-dev \
     libopencv-dev \
     libeigen3-dev \
+    ros-humble-pcl-ros \
+    ros-humble-pcl-conversions \
     && apt-get clean
 
 USER ardupilotuser
