@@ -1,0 +1,29 @@
+FROM ros:humble-ros-base AS cpp_ros_builder
+
+# create a non root user to build the packages
+# ---- User setup ----
+RUN groupadd -g 1004 ardupilotgroup \
+    && useradd -u 1003 -g 1004 -ms /bin/bash ardupilotuser \
+    && echo "ardupilotuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+    && usermod -aG dialout ardupilotuser \
+    && echo 'root:zawardo' | chpasswd \
+    && echo "export PATH=\$PATH:\$HOME/.local/bin" >> ~/.bashrc
+USER ardupilotuser
+RUN mkdir -p /home/ardupilotuser/stymphale_ws
+
+USER root
+# Ensure correct ownership and permissions for the mounted volume
+RUN sudo chown -R 1003:1004 /home/ardupilotuser/stymphale_ws && \
+    sudo chmod -R 755 /home/ardupilotuser/stymphale_ws
+
+WORKDIR /home/ardupilotuser/stymphale_ws
+
+# install PCL
+RUN apt-get update && apt-get install -y \
+    libpcl-dev \
+    libopencv-dev \
+    libeigen3-dev \
+    && apt-get clean
+
+USER ardupilotuser
+

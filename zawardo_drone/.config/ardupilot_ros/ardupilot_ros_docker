@@ -129,7 +129,8 @@ FROM arm-dds-setup AS extended-arm-dds-setup
 SHELL ["/bin/bash", "-c"]
 
 # ---- User setup ----
-RUN useradd -ms /bin/bash ardupilotuser \
+RUN groupadd -g 1004 ardupilotgroup \
+    && useradd -u 1003 -g 1004 -ms /bin/bash ardupilotuser \
     && echo "ardupilotuser ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
     && usermod -aG dialout ardupilotuser \
     && echo 'root:zawardo' | chpasswd \
@@ -249,3 +250,12 @@ RUN sudo apt-get clean \
 # --- Bashrc config ---
 RUN echo "source /home/ardupilotuser/ros2_ws/install/setup.bash" >> ~/.bashrc \
     && echo "export PATH=\$PATH:/home/ardupilotuser/ros2_ws/src/ardupilot/Tools/autotest/" >> ~/.bashrc
+
+# stymphale_ws setup
+RUN mkdir -p /home/ardupilotuser/stymphale_ws
+WORKDIR /home/ardupilotuser/stymphale_ws
+# add source to bashrc
+RUN echo "source /home/ardupilotuser/stymphale_ws/install/setup.bash" >> ~/.bashrc
+
+RUN sudo chown -R 1003:1004 /home/ardupilotuser/stymphale_ws && \
+    sudo chmod -R 755 /home/ardupilotuser/stymphale_ws

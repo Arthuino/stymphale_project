@@ -1,10 +1,11 @@
 # stymphale_project
 
-The end goal of this project is to create a ROS2 package for 3D SLAM with decentralized drone swarm.
-To support this development, there severals "modules" :
+The end goal of this project is to create a ROS2 package for 3D SLAM with decentralized autonomous drone swarm (point-cloud based, potentially multi-sensors ex: thermal). \
+The project is divided between severals "modules" :
 
 - Zawardo_drone : Docker environement for coding, test and simulation
 - Vox_drone : Python module. Experiment voxel maps possibilities
+- Antikythera : ROS package. SLAM algoritm
 
 ## Zawardo_drone
 
@@ -23,10 +24,12 @@ And some other tools like :
 
 - terminator
 - vim
--nano
+- nano
 - git
 
 <https://ardupilot.org/dev/docs/ros2-sitl.html>
+
+## Antikythera
 
 ## Vox_drone
 

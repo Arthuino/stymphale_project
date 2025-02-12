@@ -23,6 +23,32 @@ Based on ardupilot ROS2 tutorial :
 
 ## How to use
 
+### With docker compose
+
+Build ros packages
+
+```bash
+docker compose up cpp_ros_builder
+```
+
+Launch micro-ros agent
+
+```bash
+docker compose up micro_ros_agent
+```
+
+Launch QGroundControl
+
+```bash
+docker compose up qgcontrol
+```
+
+Simulation Docker environement
+
+```bash
+docker compose run ardupilot_ros_env
+```
+
 ### Docker environement
 
 Pull the docker image :
