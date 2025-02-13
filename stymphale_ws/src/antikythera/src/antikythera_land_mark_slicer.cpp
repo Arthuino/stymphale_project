@@ -81,13 +81,24 @@ private:
     auto cluster_list = segmentation_Euclidian_Cluster_Extraction(cloud);
 
     // TODO : create a visualizer somehow
+    
+    std::vector<std::shared_ptr<antikythera::LandMarkObject>> land_mark_map;
+
     int i = 0;
     for (const auto& cluster : cluster_list)
     {
-      antikythera::LandMarkObject lm_object(i);
-      lm_object.add_feature(std::make_shared<antikythera::PointCloudFeature>(cluster));
+      auto lm_object = std::make_shared<antikythera::LandMarkObject>(i);
+      lm_object->add_feature(std::make_shared<antikythera::PointCloudFeature>(cluster));
+      land_mark_map.push_back(lm_object);
       i++;
     }
+
+    // printing the land mark map
+    for (const auto& lm_object : land_mark_map)
+    {
+      lm_object->print();
+    }
+
   }
 
   std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentation_Euclidian_Cluster_Extraction(
