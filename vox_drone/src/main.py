@@ -21,7 +21,7 @@ import pyvista as pv
 from pyvista import examples
 
 
-def pyvista_example_points_cloud(subset=0.02): #TODO change to directly give voxel map and migrate to mapCreator.py
+def pyvista_example_points_cloud(subset=0.02): 
     """A helper to make a 3D NumPy array of points (n_points by 3)."""
     dataset = examples.download_lidar()
     ids = np.random.randint(low=0, high=dataset.n_points - 1, size=int(dataset.n_points * subset))

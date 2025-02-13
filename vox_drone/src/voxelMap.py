@@ -17,7 +17,7 @@ class VoxelMap:
             return
         
         placeholder = np.zeros((_width, _height, _depth),dtype=self.dtype)
-        self.set_voxelMap(placeholder) #TODO adapt to large maps
+        self.set_voxelMap(placeholder) 
         return
     
 

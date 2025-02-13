@@ -83,7 +83,7 @@ class VoxFftConverter:
         # Create a zero-filled array with the same shape as spectre
         zeros = np.zeros_like(spectre)
         
-        # TODO: marche très bien pour un cube, mais dois être généralisé 
+        
 
         # Copy the interior of spectre into the zero-filled array
         zeros[filter_size[0]:-filter_size[0],

@@ -208,6 +208,6 @@ root password inside docker : ``zawardo``
 
 ## Future improvements
 
-- [ ] Test waypoints and mission planning with ROS2 services and nodes
+- [X] Test waypoints and mission planning with ROS2 services and nodes
 
 - [X] Create separate dockers and docker-compose for each tool
