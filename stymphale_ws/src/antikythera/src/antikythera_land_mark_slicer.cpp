@@ -53,6 +53,7 @@
 #include <opencv2/core.hpp>
 
 #include "land_mark_object.hpp"
+#include "point_cloud_feature.hpp"
 
 using namespace std::chrono_literals;
 
@@ -79,14 +80,13 @@ private:
     pcl::fromROSMsg(*msg, *cloud);
     auto cluster_list = segmentation_Euclidian_Cluster_Extraction(cloud);
 
+    // TODO : create a visualizer somehow
+    int i = 0;
     for (const auto& cluster : cluster_list)
     {
-      /* TODO : create a visualizer somehow
-      pcl::visualization::CloudViewer viewer ("Simple Cloud Viewer");
-      // viewer.showCloud (cluster);
-      while (!viewer.wasStopped ())
-      {
-      } */
+      antikythera::LandMarkObject lm_object(i);
+      lm_object.add_feature(std::make_shared<antikythera::PointCloudFeature>(cluster));
+      i++;
     }
   }
 

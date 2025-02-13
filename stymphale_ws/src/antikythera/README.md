@@ -7,13 +7,13 @@ The purpose of this module is to work on the implementation of a SLAM algorithm.
 Rebuild builder Docker (ex: after adding new dependencies)
 
 ```bash
-docker compose build cpp_ros_builder
+docker compose up --remove-orphans cpp_ros_builder
 ```
 
 Build Stymphale workspace
 
 ```bash
-docker compose up cpp_ros_builder
+docker compose up --remove-orphans cpp_ros_builder
 ```
 
 Micro-ROS Agent

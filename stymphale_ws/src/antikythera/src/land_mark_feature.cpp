@@ -20,44 +20,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // 
-// @file land_mark_object.hpp
-// @brief This file contains the header of the LandMarkObject class
+// @file land_mark_feature.cpp
+// @brief This file contains the implementation of the LandMarkFeature class
 //
-
-#ifndef LAND_MARK_OBJECT_HPP
-#define LAND_MARK_OBJECT_HPP
-
-#include <string>
-#include <pcl/point_types.h>
-#include <pcl_conversions/pcl_conversions.h>
-#include <pcl/point_cloud.h>
 
 #include "land_mark_feature.hpp"
 
-
 namespace antikythera {
-    class LandMarkObject {
-    public:
-        LandMarkObject(int id);
-        LandMarkObject(int id, const std::string& label);
 
-        void print() const;
-        // Getters
-        [[nodiscard]] int get_id() const noexcept;
-        [[nodiscard]] const std::string& get_label() const noexcept;
-        [[nodiscard]] const std::vector<std::shared_ptr<LandMarkFeature>>& get_features() const noexcept;
+    std::string LandMarkFeature::get_feature_type() const {
+        return feature_type;
+    }
 
-        // Setters
-        void set_label(const std::string& label);
-        void add_feature(std::shared_ptr<LandMarkFeature> feature);
-        void remove_feature(size_t index);  // Removes a feature by index
+    FeatureData LandMarkFeature::get_feature() const {
+        return feature_data;
+    }
 
-    private:
-        int id;
-        std::string label;
-        std::vector<std::shared_ptr<LandMarkFeature>> features;  // Store multiple feature types
-    };
+    void LandMarkFeature::set_feature(FeatureData feature) {
+        feature_data = feature;
+        // set the feature type based on the variant type
+        if (std::holds_alternative<pcl::PointCloud<pcl::PointXYZ>::Ptr>(feature)) {
+            feature_type = "PointCloud";
+        } else if (std::holds_alternative<geometry_msgs::msg::TransformStamped>(feature)) {
+            feature_type = "TransformStamped";
+        } else {
+            feature_type = "Unknown";
+        }
+    }
+
 } // namespace antikythera
-
-
-#endif // LAND_MARK_OBJECT_HPP

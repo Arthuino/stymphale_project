@@ -17,6 +17,7 @@ find_package(pcl_conversions REQUIRED)
 
 # INCLUDE DIRECTORIES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(include)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${PCL_INCLUDE_DIRS})
@@ -30,8 +31,12 @@ set(PCL_LIBS ${PCL_LIBRARIES})
 set(ANTIKYTHERA_LIBS ${OPENCV_LIBS} ${EIGEN_LIBS} ${PCL_LIBS})
 
 # EXECUTABLES
-add_executable(antikythera_emulator src/antikythera_emulator.cpp)
-add_executable(antikythera_land_mark_slicer src/antikythera_land_mark_slicer.cpp)
+add_executable(antikythera_emulator src/antikythera_emulator.cpp src/land_mark_object.cpp)
+add_executable(antikythera_land_mark_slicer src/antikythera_land_mark_slicer.cpp
+                                            src/land_mark_object.cpp
+                                            src/land_mark_object.cpp
+                                            src/land_mark_feature.cpp
+                                            src/point_cloud_feature.cpp)
 
 # LINKING
 target_link_libraries(antikythera_emulator ${ANTIKYTHERA_LIBS})

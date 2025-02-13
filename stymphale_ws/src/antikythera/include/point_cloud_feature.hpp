@@ -19,45 +19,33 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-// 
-// @file land_mark_object.hpp
-// @brief This file contains the header of the LandMarkObject class
+//
+// @file point_cloud_feature.hpp
+// @brief This file contains the definition of the PointCloudFeature class
 //
 
-#ifndef LAND_MARK_OBJECT_HPP
-#define LAND_MARK_OBJECT_HPP
 
-#include <string>
-#include <pcl/point_types.h>
-#include <pcl_conversions/pcl_conversions.h>
+#ifndef POINT_CLOUD_FEATURE_HPP
+#define POINT_CLOUD_FEATURE_HPP
+
+#include "land_mark_feature.hpp"  // Include the header for the LandMarkFeature base class
 #include <pcl/point_cloud.h>
-
-#include "land_mark_feature.hpp"
-
+#include <pcl/point_types.h>
 
 namespace antikythera {
-    class LandMarkObject {
+
+    class PointCloudFeature : public LandMarkFeature {
     public:
-        LandMarkObject(int id);
-        LandMarkObject(int id, const std::string& label);
+        // Constructor that calls the base class constructor
+        PointCloudFeature(const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud)
+            : LandMarkFeature("PointCloud", cloud) {}
 
-        void print() const;
-        // Getters
-        [[nodiscard]] int get_id() const noexcept;
-        [[nodiscard]] const std::string& get_label() const noexcept;
-        [[nodiscard]] const std::vector<std::shared_ptr<LandMarkFeature>>& get_features() const noexcept;
-
-        // Setters
-        void set_label(const std::string& label);
-        void add_feature(std::shared_ptr<LandMarkFeature> feature);
-        void remove_feature(size_t index);  // Removes a feature by index
-
-    private:
-        int id;
-        std::string label;
-        std::vector<std::shared_ptr<LandMarkFeature>> features;  // Store multiple feature types
+        void print() const override;  // Print details of the feature
+        void set_feature(FeatureData feature) override;  // Set the feature data
+        FeatureData get_feature() const override;  // Get the feature data
+        std::string get_feature_type() const override;  // Return the feature type as "PointCloud" by default
     };
+
 } // namespace antikythera
 
-
-#endif // LAND_MARK_OBJECT_HPP
+#endif // POINT_CLOUD_FEATURE_HPP

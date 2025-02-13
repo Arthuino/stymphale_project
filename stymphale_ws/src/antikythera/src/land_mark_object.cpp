@@ -26,30 +26,60 @@
 
 #include "land_mark_object.hpp"
 
+#include <pcl/point_types.h>
+#include <pcl_conversions/pcl_conversions.h>
+
 #include <iostream>
 #include <string>
+#include <memory>
 
-class LandMarkObject {
-public:
-    LandMarkObject(double id) : id(id), label("default") {}
-    LandMarkObject(double id, std::string label) : id(id), label(label) {}
+#include "land_mark_feature.hpp"
 
-    void print() const {
-        std::cout << id << " : " << label << std::endl;
+namespace antikythera {
+    
+    // Constructors
+    LandMarkObject::LandMarkObject(int id) 
+        : id(id), label("default") {}
+
+    LandMarkObject::LandMarkObject(int id, const std::string& label) 
+        : id(id), label(label) {}
+
+    // Print
+    void LandMarkObject::print() const {
+        std::cout << "LandMarkObject ID: " << id << ", Label: " << label << std::endl;
+        std::cout << "Features: " << features.size() << std::endl;
+        for (const auto& feature : features) {
+            feature->print();
+        }
     }
 
     // Getters
-    double get_id() const {
+    int LandMarkObject::get_id() const noexcept {
         return id;
     }
 
-    std::string get_label() const {
+    const std::string& LandMarkObject::get_label() const noexcept {
         return label;
     }
 
+    const std::vector<std::shared_ptr<LandMarkFeature>>& LandMarkObject::get_features() const noexcept {
+        return features;
+    }
+
     // Setters
-    void set_label(std::string label) {
+    void LandMarkObject::set_label(const std::string& label) {
         this->label = label;
     }
 
-};
+    void LandMarkObject::add_feature(std::shared_ptr<LandMarkFeature> feature) {
+        features.push_back(std::move(feature));
+    }
+
+    void LandMarkObject::remove_feature(size_t index) {
+        if (index < features.size()) {
+            features.erase(features.begin() + index);
+        } else {
+            std::cerr << "Error: Feature index out of bounds." << std::endl;
+        }
+    }
+} // namespace antikythera
