@@ -16,6 +16,7 @@ find_package(PCL 1.3 REQUIRED)
 find_package(pcl_conversions REQUIRED)
 
 # INCLUDE DIRECTORIES
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${PCL_INCLUDE_DIRS})

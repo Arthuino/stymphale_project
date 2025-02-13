@@ -54,7 +54,7 @@ public:
       "/antikythera/emulator/point_cloud", 10
     );
     timer_ = this->create_wall_timer(
-      2s, std::bind(&PointCloudPublisher::timer_callback, this));
+      10s, std::bind(&PointCloudPublisher::timer_callback, this));
   }
 
 private:
