@@ -14,6 +14,8 @@ find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(PCL 1.3 REQUIRED)
 find_package(pcl_conversions REQUIRED)
+# antikythera pkgs
+find_package(antikythera_msgs REQUIRED)
 
 # INCLUDE DIRECTORIES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -47,6 +49,7 @@ ament_target_dependencies(antikythera_emulator
   std_msgs
   sensor_msgs
   pcl_conversions
+  antikythera_msgs
 )
 
 ament_target_dependencies(antikythera_land_mark_slicer

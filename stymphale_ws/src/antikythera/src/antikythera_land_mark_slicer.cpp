@@ -46,14 +46,19 @@
 #include <memory>
 #include <string>
 
+// ROS2 includes
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/header.hpp"
 #include "std_msgs/msg/string.hpp"
-#include "sensor_msgs/msg/point_cloud2.hpp"
 #include <opencv2/core.hpp>
+// ROS2 message 
+#include "sensor_msgs/msg/point_cloud2.hpp"
 
+// Antikythera includes
 #include "land_mark_object.hpp"
 #include "point_cloud_feature.hpp"
+//Antikythera message
+#include "antikythera_msgs/msg/LandMarkObject.hpp"
 
 using namespace std::chrono_literals;
 
@@ -67,11 +72,15 @@ public:
       "/antikythera/emulator/point_cloud", 10, std::bind(
         &LandMarkSlicer::sub_callback, this, std::placeholders::_1
     ));
+    
+    object_publisher_ = this->create_publisher<antikythera_msgs::msg::LandMarkObject>(
+      "/antikythera/land_mark_object", 10
+    );
   }
 
 private:
-  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr publisher_;
   rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr subscriber_;
+  rclcpp::Publisher<antikythera_msgs::msg::LandMarkObject>::SharedPtr object_publisher_;
 
   void sub_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg)
   {
@@ -98,7 +107,12 @@ private:
     {
       lm_object->print();
     }
-
+    // publish the map
+    for (const auto& lm_object : land_mark_map) {
+      antikythera::LandMarkObject ros_msg = lm_object->toROSmsg();
+      object_publisher_.publish(ros_msg);
+      ROS_INFO("Published LandMarkObject with ID: %d", lm_object->get_id());
+    }
   }
 
   std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> segmentation_Euclidian_Cluster_Extraction(
