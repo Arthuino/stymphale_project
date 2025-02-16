@@ -28,22 +28,21 @@
 #ifndef POINT_CLOUD_FEATURE_HPP
 #define POINT_CLOUD_FEATURE_HPP
 
-#include "land_mark_feature.hpp"  // Include the header for the LandMarkFeature base class
+#include "land_mark_feature.hpp"
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
+#include <iostream>
 
 namespace antikythera {
 
     class PointCloudFeature : public LandMarkFeature {
     public:
-        // Constructor that calls the base class constructor
+        // Constructor
         PointCloudFeature(const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud)
             : LandMarkFeature("PointCloud", cloud) {}
 
-        void print() const override;  // Print details of the feature
-        void set_feature(FeatureData feature) override;  // Set the feature data
-        FeatureData get_feature() const override;  // Get the feature data
-        std::string get_feature_type() const override;  // Return the feature type as "PointCloud" by default
+        // Correctly declare the print function
+        void print() const override;
     };
 
 } // namespace antikythera

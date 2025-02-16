@@ -56,9 +56,10 @@
 
 // Antikythera includes
 #include "land_mark_object.hpp"
+#include "land_mark_feature.hpp"
 #include "point_cloud_feature.hpp"
 //Antikythera message
-#include "antikythera_msgs/msg/LandMarkObject.hpp"
+#include "antikythera_msgs/msg/land_mark_object.hpp"
 
 using namespace std::chrono_literals;
 
@@ -109,9 +110,11 @@ private:
     }
     // publish the map
     for (const auto& lm_object : land_mark_map) {
-      antikythera::LandMarkObject ros_msg = lm_object->toROSmsg();
-      object_publisher_.publish(ros_msg);
-      ROS_INFO("Published LandMarkObject with ID: %d", lm_object->get_id());
+      antikythera_msgs::msg::LandMarkObject ros_msg;
+      //antikythera::LandMarkObject::toROSMsg(*lm_object, ros_msg);
+      
+      //object_publisher_->publish(ros_msg);
+      RCLCPP_INFO(rclcpp::get_logger("landMarkSlicer"), "Published LandMarkObject with ID: %d", lm_object->get_id());
     }
   }
 

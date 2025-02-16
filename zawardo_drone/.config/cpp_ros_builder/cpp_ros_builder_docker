@@ -27,5 +27,5 @@ RUN apt-get update && apt-get install -y \
     ros-humble-pcl-conversions \
     && apt-get clean
 
+RUN echo "source /home/ardupilotuser/stymphale_ws/install/setup.bash" >> /home/ardupilotuser/.bashrc
 USER ardupilotuser
-

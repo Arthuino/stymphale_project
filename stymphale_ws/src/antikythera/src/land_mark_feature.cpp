@@ -25,8 +25,25 @@
 //
 
 #include "land_mark_feature.hpp"
+#include <antikythera_msgs/msg/land_mark_feature.hpp>
 
 namespace antikythera {
+
+    LandMarkFeature::~LandMarkFeature() = default;
+
+    LandMarkFeature::LandMarkFeature() = default;
+
+    LandMarkFeature::LandMarkFeature(const std::string& feature_type, FeatureData feature_data)
+    : feature_type(feature_type), feature_data(feature_data) {}
+
+    void LandMarkFeature::print() const {
+        if (!feature_type.empty()){
+            std::cout << "Feature Type: " << feature_type << std::endl;
+        } else {
+            std::cout << "Feature Type: Unknown" << std::endl;
+        }
+        
+    }
 
     std::string LandMarkFeature::get_feature_type() const {
         return feature_type;
@@ -45,6 +62,37 @@ namespace antikythera {
             feature_type = "TransformStamped";
         } else {
             feature_type = "Unknown";
+        }
+    }
+
+
+    // ROS serialization methods
+    void LandMarkFeature::toROSMsg(const LandMarkFeature& landMarkFeature, antikythera_msgs::msg::LandMarkFeature& msg) {
+        // Set Feature Type
+        msg.feature_type = landMarkFeature.get_feature_type();
+        // Set Flags
+        msg.is_point_cloud = std::holds_alternative<pcl::PointCloud<pcl::PointXYZ>::Ptr>(landMarkFeature.get_feature());
+        msg.is_transform = std::holds_alternative<geometry_msgs::msg::TransformStamped>(landMarkFeature.get_feature());
+
+        // Set Feature Data
+        if (msg.is_point_cloud) {       // PointCloud Feature
+            auto cloud = std::get<pcl::PointCloud<pcl::PointXYZ>::Ptr>(landMarkFeature.get_feature());
+            pcl::toROSMsg(*cloud, msg.point_cloud);
+
+        } else if (msg.is_transform) {  // Transform Feature
+            printf("Transform feature not implemented yet\n");
+        }
+    }
+
+    void LandMarkFeature::fromROSMsg(const antikythera_msgs::msg::LandMarkFeature& msg, LandMarkFeature& landMarkFeature) {
+
+        if (msg.is_point_cloud) {   // PointCloud Feature
+            auto cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
+            pcl::fromROSMsg(msg.point_cloud, *cloud);
+            landMarkFeature.set_feature(cloud);
+
+        } else if (msg.is_transform) {  // Transform Feature
+            printf("Transform feature not implemented yet\n");
         }
     }
 

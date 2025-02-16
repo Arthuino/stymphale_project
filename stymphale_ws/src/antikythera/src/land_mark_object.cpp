@@ -35,6 +35,8 @@
 
 #include "land_mark_feature.hpp"
 
+// TODO : Implement the toROSMsg and fromROSMsg method
+
 namespace antikythera {
     
     // Constructors
@@ -82,4 +84,25 @@ namespace antikythera {
             std::cerr << "Error: Feature index out of bounds." << std::endl;
         }
     }
+
+
+    void LandMarkObject::toROSMsg(const LandMarkObject& land_mark_object, antikythera_msgs::msg::LandMarkObject& msg) {
+        msg.id = land_mark_object.get_id();
+        msg.label = land_mark_object.get_label();
+        for (const auto& feature : land_mark_object.get_features()) {
+            antikythera_msgs::msg::LandMarkFeature feature_msg;
+            LandMarkFeature::toROSMsg(*feature, feature_msg);
+            msg.features.push_back(feature_msg);
+        }
+    }
+    
+    void LandMarkObject::fromROSMsg(const antikythera_msgs::msg::LandMarkObject& msg, LandMarkObject& land_mark_object){
+        land_mark_object = LandMarkObject(msg.id, msg.label);
+        for (const auto& feature_msg : msg.features) {
+            std::shared_ptr<LandMarkFeature> feature = std::make_shared<LandMarkFeature>();
+            LandMarkFeature::fromROSMsg(feature_msg, *feature);
+            land_mark_object.add_feature(feature);
+        }
+    }
+    
 } // namespace antikythera

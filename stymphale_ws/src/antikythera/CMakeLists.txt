@@ -19,12 +19,15 @@ find_package(antikythera_msgs REQUIRED)
 
 # INCLUDE DIRECTORIES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-include_directories(include)
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIR})
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
+# Antikythera msgs
+include_directories(${antikythera_msgs_INCLUDE_DIRS})
+# AntiKythera
+
 
 # VARIABLES FOR LIBRARIES
 set(OPENCV_LIBS ${OpenCV_LIBRARIES})
@@ -33,18 +36,35 @@ set(PCL_LIBS ${PCL_LIBRARIES})
 set(ANTIKYTHERA_LIBS ${OPENCV_LIBS} ${EIGEN_LIBS} ${PCL_LIBS})
 
 # EXECUTABLES
-add_executable(antikythera_emulator src/antikythera_emulator.cpp src/land_mark_object.cpp)
+# EMULATOR
+add_executable(antikythera_emulator src/antikythera_emulator.cpp)
+
+target_link_libraries(antikythera_emulator ${ANTIKYTHERA_LIBS})
+
+ament_target_dependencies(antikythera_emulator
+  rclcpp
+  std_msgs
+  sensor_msgs
+  pcl_conversions
+)
+
+
+
+target_include_directories(antikythera_emulator PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+      $<INSTALL_INTERFACE:include>)
+target_compile_features(antikythera_emulator PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+
+
+# LAND MARK SLICER
 add_executable(antikythera_land_mark_slicer src/antikythera_land_mark_slicer.cpp
-                                            src/land_mark_object.cpp
                                             src/land_mark_object.cpp
                                             src/land_mark_feature.cpp
                                             src/point_cloud_feature.cpp)
 
-# LINKING
-target_link_libraries(antikythera_emulator ${ANTIKYTHERA_LIBS})
 target_link_libraries(antikythera_land_mark_slicer ${ANTIKYTHERA_LIBS})
 
-ament_target_dependencies(antikythera_emulator
+ament_target_dependencies(antikythera_land_mark_slicer
   rclcpp
   std_msgs
   sensor_msgs
@@ -52,26 +72,18 @@ ament_target_dependencies(antikythera_emulator
   antikythera_msgs
 )
 
-ament_target_dependencies(antikythera_land_mark_slicer
-  rclcpp
-  std_msgs
-  sensor_msgs
-  pcl_conversions
-)
-
-target_include_directories(antikythera_emulator PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
-target_compile_features(antikythera_emulator PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-
 target_include_directories(antikythera_land_mark_slicer PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 target_compile_features(antikythera_land_mark_slicer PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
+
+
+# INSTALL
 install(TARGETS antikythera_emulator antikythera_land_mark_slicer
   DESTINATION lib/${PROJECT_NAME})
 
+# TESTING
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)

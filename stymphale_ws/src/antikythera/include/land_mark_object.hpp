@@ -33,11 +33,17 @@
 #include <pcl/point_cloud.h>
 
 #include "land_mark_feature.hpp"
+// message includes
+#include "antikythera_msgs/msg/land_mark_object.hpp"
+
+
+// TODO : Implement the toROSmsg and fromROSMsg method
 
 
 namespace antikythera {
     class LandMarkObject {
     public:
+        LandMarkObject() = default;
         LandMarkObject(int id);
         LandMarkObject(int id, const std::string& label);
 
@@ -52,12 +58,16 @@ namespace antikythera {
         void add_feature(std::shared_ptr<LandMarkFeature> feature);
         void remove_feature(size_t index);  // Removes a feature by index
 
+        // ROS serialization methods
+        static void toROSMsg(const LandMarkObject& land_mark_object, antikythera_msgs::msg::LandMarkObject& msg);
+        static void fromROSMsg(const antikythera_msgs::msg::LandMarkObject& msg, LandMarkObject& land_mark_object);
+
     private:
         int id;
         std::string label;
         std::vector<std::shared_ptr<LandMarkFeature>> features;  // Store multiple feature types
+
     };
 } // namespace antikythera
-
 
 #endif // LAND_MARK_OBJECT_HPP

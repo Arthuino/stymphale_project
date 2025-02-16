@@ -1,11 +1,32 @@
-#include "point_cloud_feature.hpp"
-#include <iostream>
-#include <variant>
+// MIT License
+//
+// Copyright (c) 2025 Arthur VIGOUROUX
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+// @file point_cloud_feature.cpp
+// @brief This file contains the implemention of the PointCloudFeature class
+//
 
-#include "land_mark_feature.hpp"
+
 #include "point_cloud_feature.hpp"
 #include <iostream>
-#include <variant>
 
 namespace antikythera {
 
@@ -15,20 +36,6 @@ namespace antikythera {
         } else {
             std::cout << "Feature is not a PointCloud." << std::endl;
         }
-    }
-
-    void PointCloudFeature::set_feature(FeatureData feature) {
-        // Set the feature directly using the parent class's method
-        LandMarkFeature::set_feature(feature);
-    }
-
-    FeatureData PointCloudFeature::get_feature() const {
-        // Return the feature data directly from the parent class
-        return LandMarkFeature::get_feature();
-    }
-
-    std::string PointCloudFeature::get_feature_type() const {
-        return "PointCloud";
     }
 
 } // namespace antikythera
