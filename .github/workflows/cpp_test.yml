@@ -8,6 +8,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      # print the current directory
+      - name: Print current directory
+        run: pwd && ls -a
 
       - name: Run Tester docker
         uses: hoverkraft-tech/compose-action@v2.0.1
