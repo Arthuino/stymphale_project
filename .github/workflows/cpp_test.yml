@@ -30,6 +30,16 @@ jobs:
           compose-file: zawardo_drone/.config/workflow-compose.yaml
           service: cpp_ros_autotester
 
+      - name: Collect Test Results
+        run: |
+          docker logs cpp_ros_tester  
+          docker wait cpp_ros_tester
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "had test failures"
+            exit 1
+          fi
+
         
 
 
