@@ -38,7 +38,7 @@ services:
       args:
         - ~/work/stymphale_project/stymphale_project/stymphale_ws
     image: arthuino/stymphale-cpp_ros_builder:latest
-    container_name: cpp_ros_autotester
+    container_name: cpp_ros_autotester_collector
     network_mode: host
     restart: "no"
     volumes:
