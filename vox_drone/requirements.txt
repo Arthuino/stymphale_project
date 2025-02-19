@@ -38,7 +38,7 @@ exceptiongroup==1.2.1
 executing==2.0.1
 fastjsonschema==2.20.0
 fonttools==4.53.0
-httplib2==0.14.0
+httplib2==0.19.0
 hyperlink==19.0.0
 idna==2.8
 importlib-metadata==7.1.0
