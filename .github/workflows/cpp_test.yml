@@ -13,11 +13,9 @@ jobs:
         run: pwd && ls -a
 
       - name: Run Tester docker
-        uses: cloudposse/github-action-docker-compose-test-run@main
+        uses: hoverkraft-tech/compose-action@main
         with:
-          file: zawardo_drone/.config/compose.yaml
-          service: cpp_ros_autotester
-          command: bash -c "colcon test --ctest-args tests && colcon test-result --all --verbose"
-          registry: arthuino
+          compose-file: zawardo_drone/.config/compose.yaml
+          services: cpp_ros_autotester
 
-          
+
