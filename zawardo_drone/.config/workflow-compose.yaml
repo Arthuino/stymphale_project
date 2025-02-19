@@ -1,0 +1,32 @@
+services:  
+  cpp_ros_autobuilder:
+    build:
+      context: .
+      dockerfile: cpp_ros_builder/cpp_ros_builder_docker
+      args:
+        - ~/work/stymphale_project/stymphale_project/stymphale_ws
+    image: arthuino/stymphale-cpp_ros_builder:latest
+    container_name: cpp_ros_builder
+    network_mode: host
+    restart: "no"
+    volumes:
+      - type: bind
+        source: ~/work/stymphale_project/stymphale_project/stymphale_ws
+        target: /home/ardupilotuser/stymphale_ws/  # Mount stymphale_ws for building
+    command: bash -c "rm -rf bash/ install/ log/ && colcon build --symlink-install --cmake-clean-cache --cmake-args -DCMAKE_VERBOSE_MAKEFILE=ON"
+
+  cpp_ros_autotester:
+    build:
+      context: .
+      dockerfile: cpp_ros_builder/cpp_ros_builder_docker
+      args:
+        - ~/work/stymphale_project/stymphale_project/stymphale_ws
+    image: arthuino/stymphale-cpp_ros_builder:latest
+    container_name: cpp_ros_tester
+    network_mode: host
+    restart: "no"
+    volumes:
+      - type: bind
+        source: ~/work/stymphale_project/stymphale_project/stymphale_ws
+        target: /home/ardupilotuser/stymphale_ws/  # Mount stymphale_ws for building
+    command: sudo colcon test --ctest-args tests

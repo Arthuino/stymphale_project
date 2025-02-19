@@ -18,10 +18,16 @@ jobs:
       - name: pulling docker image
         run: docker pull arthuino/stymphale-cpp_ros_builder:latest
 
+      - name: Build Workspace
+        uses: adrielcodeco/docker-compose-run-action@v1
+        with:
+          compose-file: zawardo_drone/.config/workflow-compose.yaml
+          service: cpp_ros_autobuilder
+
       - name: Run Tester docker
         uses: adrielcodeco/docker-compose-run-action@v1
         with:
-          compose-file: zawardo_drone/.config/compose.yaml
+          compose-file: zawardo_drone/.config/workflow-compose.yaml
           service: cpp_ros_autotester
 
 
