@@ -13,7 +13,7 @@ docker run -it --rm \
             -v /tmp/.X11-unix:/tmp/.X11-unix \
             -v /dev/dri/card0:/dev/dri/card0 \
             -v /home/arthuino/stymphale_project/vox_drone:/app/vox_drone \
-            vox_drone:latest
+            arthuino/stymphale-vox_drone:latest
             
 xhost -local:*
 
