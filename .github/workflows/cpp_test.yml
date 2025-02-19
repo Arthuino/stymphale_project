@@ -30,4 +30,9 @@ jobs:
           compose-file: zawardo_drone/.config/workflow-compose.yaml
           service: cpp_ros_autotester
 
+      - name: Collect Test Results
+        run: |
+          docker start cpp_ros_tester || true
+          docker exec cpp_ros_tester colcon test-result --all --verbose || exit 1
+
 
