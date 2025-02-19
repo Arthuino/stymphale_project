@@ -45,4 +45,4 @@ services:
       - type: bind
         source: ~/work/stymphale_project/stymphale_project/stymphale_ws
         target: /home/ardupilotuser/stymphale_ws/  # Mount stymphale_ws for building
-    command: source /opt/ros/humble/setup.bash && sudo colcon test-result --all --verbose
+    command: sudo bash -c "source /opt/ros/humble/setup.bash && sudo colcon test-result --all --verbose"
