@@ -18,9 +18,6 @@ jobs:
       - name: pulling docker image
         run: docker pull arthuino/stymphale-cpp_ros_builder:latest
 
-      - name: Create user
-        run: sudo groupadd -g 1004 ardupilotgroup && sudo useradd -u 1003 -g 1004 -ms /bin/bash ardupilotuser
-
       - name: Build Workspace
         uses: adrielcodeco/docker-compose-run-action@v1
         with:
