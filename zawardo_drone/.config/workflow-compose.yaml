@@ -6,7 +6,7 @@ services:
       args:
         - ~/work/stymphale_project/stymphale_project/stymphale_ws
     image: arthuino/stymphale-cpp_ros_builder:latest
-    container_name: cpp_ros_builder
+    container_name: cpp_ros_autobuilder
     network_mode: host
     restart: "no"
     volumes:
@@ -22,7 +22,7 @@ services:
       args:
         - ~/work/stymphale_project/stymphale_project/stymphale_ws
     image: arthuino/stymphale-cpp_ros_builder:latest
-    container_name: cpp_ros_tester
+    container_name: cpp_ros_autotester
     network_mode: host
     restart: "no"
     volumes:
