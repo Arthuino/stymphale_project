@@ -88,6 +88,6 @@ services:
       - type: bind
         source: ~/stymphale_project/stymphale_ws
         target: /home/ardupilotuser/stymphale_ws/  # Mount stymphale_ws for building
-    command: colcon test-result --all --verbose
+    command: sudo bash -c "sudo colcon test --ctest-args tests && colcon test-result --all --verbose" 
 
     
