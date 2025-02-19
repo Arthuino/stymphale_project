@@ -24,7 +24,7 @@ command-not-found==0.3
 configobj==5.0.6
 constantly==15.1.0
 contourpy==1.1.1
-cryptography==2.8
+cryptography==44.0.1
 cycler==0.12.1
 dbus-python==1.2.16
 debugpy==1.8.1
