@@ -95,7 +95,7 @@ private:
     std::vector<std::shared_ptr<antikythera::LandMarkObject>> land_mark_map;
 
     int i = 0;
-    for (const auto& cluster : cluster_list) {
+    for (const auto & cluster : cluster_list) {
       auto lm_object = std::make_shared<antikythera::LandMarkObject>(i);
       lm_object->add_feature(std::make_shared<antikythera::PointCloudFeature>(cluster));
       land_mark_map.push_back(lm_object);
