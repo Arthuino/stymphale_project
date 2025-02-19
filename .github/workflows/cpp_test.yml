@@ -15,6 +15,8 @@ jobs:
       - name: Debuging
         run: docker-compose --version
 
+      - name: pulling docker image
+        run: docker pull arthuino/stymphale-cpp_ros_builder:latest
 
       - name: Run Tester docker
         uses: adrielcodeco/docker-compose-run-action@v1
