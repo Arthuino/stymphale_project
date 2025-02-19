@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y \
     libeigen3-dev \
     ros-humble-pcl-ros \
     ros-humble-pcl-conversions \
+    ros-humble-ament-cmake-test \
     && apt-get clean
 
 RUN echo "source /home/ardupilotuser/stymphale_ws/install/setup.bash" >> /home/ardupilotuser/.bashrc
