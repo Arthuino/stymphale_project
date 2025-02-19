@@ -31,8 +31,10 @@ jobs:
           service: cpp_ros_autotester
 
       - name: Collect Test Results
-        run: |
-          docker start cpp_ros_autotester || true
-          docker exec cpp_ros_autotester colcon test-result --all --verbose || exit 1
+        uses: adrielcodeco/docker-compose-run-action@v1
+        with:
+          compose-file: zawardo_drone/.config/workflow-compose.yaml
+          service: cpp_ros_autotestcollector
+        
 
 
