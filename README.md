@@ -1,5 +1,6 @@
 # stymphale_project
 
+[![License](https://img.shields.io/github/license/arthuino/stymphale_project)](https://github.com/arthuino/stymphale_project/blob/main/LICENSE)
 ![Tests Status](https://img.shields.io/github/actions/workflow/status/arthuino/stymphale_project/cpp_test.yml?branch=main)
 
 The end goal of this project is to create a ROS2 package for 3D SLAM with decentralized autonomous drone swarm (point-cloud based, potentially multi-sensors ex: thermal). \
