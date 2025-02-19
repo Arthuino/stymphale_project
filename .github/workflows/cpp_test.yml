@@ -29,7 +29,3 @@ jobs:
         with:
           compose-file: zawardo_drone/.config/workflow-compose.yaml
           service: cpp_ros_autotester
-
-        
-
-
