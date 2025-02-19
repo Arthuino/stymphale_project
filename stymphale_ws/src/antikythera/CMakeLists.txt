@@ -105,6 +105,11 @@ if(BUILD_TESTING)
 
   target_link_libraries(${PROJECT_NAME}_test ${ANTIKYTHERA_LIBS})
 
+  # install test
+  install(TARGETS ${PROJECT_NAME}_test
+    DESTINATION lib/${PROJECT_NAME})
+
+
 endif()
 
 ament_package()
