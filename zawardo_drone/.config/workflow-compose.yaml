@@ -13,7 +13,7 @@ services:
       - type: bind
         source: ~/work/stymphale_project/stymphale_project/stymphale_ws
         target: /home/ardupilotuser/stymphale_ws/  # Mount stymphale_ws for building
-    command: bash -c "rm -rf bash/ install/ log/ && colcon build --symlink-install --cmake-clean-cache --cmake-args -DCMAKE_VERBOSE_MAKEFILE=ON"
+    command: sudo bash -c "rm -rf bash/ install/ log/ && colcon build --symlink-install --cmake-clean-cache --cmake-args -DCMAKE_VERBOSE_MAKEFILE=ON"
 
   cpp_ros_autotester:
     build:
