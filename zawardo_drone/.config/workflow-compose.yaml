@@ -29,6 +29,4 @@ services:
       - type: bind
         source: ~/work/stymphale_project/stymphale_project/stymphale_ws
         target: /home/ardupilotuser/stymphale_ws/  # Mount stymphale_ws for building
-    command: bash -c "|
-      sudo colcon test --ctest-args tests || exit 1
-      docker exec cpp_ros_autotester colcon test-result --all --verbose | grep "had test failures" && exit 1 || exit 0"
+    command: bash -c "colcon test --ctest-args tests && colcon test-result --all --verbose | grep -q "had test failures" && exit 1 || exit 0"
