@@ -15,7 +15,7 @@ jobs:
       - name: Run Tester docker
         uses: cloudposse/github-action-docker-compose-test-run@main
         with:
-          file: compose.yaml
+          file: zawardo_drone\.config\compose.yaml
           service: cpp_ros_autotester
           command: bash -c "colcon test --ctest-args tests && colcon test-result --all --verbose"
           registry: arthuino
