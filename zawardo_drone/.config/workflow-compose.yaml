@@ -31,7 +31,7 @@ services:
         target: /home/ardupilotuser/stymphale_ws/  # Mount stymphale_ws for building
     command: sudo colcon test --ctest-args tests
 
-    cpp_ros_autotestcollector:
+  cpp_ros_autotestcollector:
     build:
       context: .
       dockerfile: cpp_ros_builder/cpp_ros_builder_dockers
