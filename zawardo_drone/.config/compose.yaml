@@ -6,7 +6,7 @@ services:
     image: zawardo/qgcontrol:latest
     container_name: qgcontrol
     network_mode: host
-    restart: no
+    restart: "no"
     environment:
     - DISPLAY=${DISPLAY}
     - QT_X11_NO_MITSHM=1
@@ -20,7 +20,7 @@ services:
     image: microros/micro-ros-agent:humble
     container_name: micro_ros_agent
     network_mode: host
-    restart: no
+    restart: "no"
     command: udp4 -p 2019 # Specify the arguments for the container
     stdin_open: true  # Keep stdin open for interactive mode
     tty: true
@@ -32,7 +32,7 @@ services:
     image: zawardo/ardupilot_ros:latest
     container_name: ardupilot_ros
     network_mode: host
-    restart: no
+    restart: "no"
     environment:
     - DISPLAY=${DISPLAY}
     - QT_X11_NO_MITSHM=1
@@ -51,7 +51,7 @@ services:
     image: arthuino/stymphale-cpp_ros_builder:latest
     container_name: cpp_ros_builder
     network_mode: host
-    restart: no
+    restart: "no"
     volumes:
       - type: bind
         source: /home/arthuino/stymphale_project/stymphale_ws
@@ -67,7 +67,7 @@ services:
     image: arthuino/stymphale-cpp_ros_builder:latest
     container_name: cpp_ros_tester
     network_mode: host
-    restart: no
+    restart: "no"
     volumes:
       - type: bind
         source: ~/stymphale_project/stymphale_ws
@@ -83,7 +83,7 @@ services:
     image: arthuino/stymphale-cpp_ros_builder:latest
     container_name: cpp_ros_tester
     network_mode: host
-    restart: no
+    restart: "no"
     volumes:
       - type: bind
         source: ~/work/stymphale_project/stymphale_project/stymphale_ws
