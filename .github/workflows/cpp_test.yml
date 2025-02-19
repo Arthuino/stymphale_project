@@ -30,11 +30,6 @@ jobs:
           compose-file: zawardo_drone/.config/workflow-compose.yaml
           service: cpp_ros_autotester
 
-      - name: Collect Test Results
-        uses: adrielcodeco/docker-compose-run-action@v1
-        with:
-          compose-file: zawardo_drone/.config/workflow-compose.yaml
-          service: cpp_ros_autotestcollector
         
 
 
