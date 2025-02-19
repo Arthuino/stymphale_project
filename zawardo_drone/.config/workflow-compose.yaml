@@ -45,4 +45,4 @@ services:
       - type: bind
         source: ~/work/stymphale_project/stymphale_project/stymphale_ws
         target: /home/ardupilotuser/stymphale_ws/  # Mount stymphale_ws for building
-    command: colcon test-result --all --verbose
+    command: sudo colcon test-result --all --verbose
