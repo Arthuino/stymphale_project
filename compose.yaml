@@ -1,2 +1,2 @@
 include:
-  file: zawardo_drone/.config/compose.yaml
+  - zawardo_drone/.config/compose.yaml
