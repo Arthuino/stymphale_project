@@ -40,7 +40,7 @@ fastjsonschema==2.20.0
 fonttools==4.53.0
 httplib2==0.19.0
 hyperlink==19.0.0
-idna==2.8
+idna==3.7
 importlib-metadata==7.1.0
 importlib-resources==6.4.0
 incremental==16.10.1
