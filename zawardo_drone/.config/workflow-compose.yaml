@@ -30,5 +30,5 @@ services:
         source: ~/work/stymphale_project/stymphale_project/stymphale_ws
         target: /home/ardupilotuser/stymphale_ws/  # Mount stymphale_ws for building
     command: |
-    colcon test --ctest-args tests || exit 1
-    docker exec cpp_ros_autotester colcon test-result --all --verbose | grep "had test failures" && exit 1 || exit 0
+      colcon test --ctest-args tests || exit 1
+      docker exec cpp_ros_autotester colcon test-result --all --verbose | grep "had test failures" && exit 1 || exit 0
