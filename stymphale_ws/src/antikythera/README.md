@@ -33,7 +33,7 @@ docker compose run ardupilot_ros_env
 Run tests
 
 ```bash
-docker compose build cpp_ros_tester
+docker compose run --remove-orphans cpp_ros_tester
 ```
 
 View test results

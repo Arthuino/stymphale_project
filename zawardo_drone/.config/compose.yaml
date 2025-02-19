@@ -48,7 +48,7 @@ services:
       dockerfile: cpp_ros_builder/cpp_ros_builder_docker
       args:
         - MOUNT_DIR=/home/arthuino/stymphale_project/stymphale_ws
-    image: zawardo/cpp_ros_builder:latest
+    image: arthuino/stymphale-cpp_ros_builder:latest
     container_name: cpp_ros_builder
     network_mode: host
     restart: no
@@ -64,7 +64,7 @@ services:
       dockerfile: cpp_ros_builder/cpp_ros_builder_docker
       args:
         - MOUNT_DIR=/home/arthuino/stymphale_project/stymphale_ws
-    image: zawardo/cpp_ros_builder:latest
+    image: arthuino/stymphale-cpp_ros_builder:latest
     container_name: cpp_ros_tester
     network_mode: host
     restart: no
@@ -72,5 +72,5 @@ services:
       - type: bind
         source: /home/arthuino/stymphale_project/stymphale_ws
         target: /home/ardupilotuser/stymphale_ws/  # Mount stymphale_ws for building
-    command: colcon test --ctest-args tests
+    command: bash -c "colcon test --ctest-args tests && colcon test-result --all --verbose"
     
