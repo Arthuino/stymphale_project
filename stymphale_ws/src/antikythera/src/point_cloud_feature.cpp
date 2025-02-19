@@ -28,14 +28,16 @@
 #include "point_cloud_feature.hpp"
 #include <iostream>
 
-namespace antikythera {
+namespace antikythera
+{
 
-    void PointCloudFeature::print() const {
-        if (auto* pc = std::get_if<pcl::PointCloud<pcl::PointXYZ>::Ptr>(&feature_data)) {
-            std::cout << "PointCloudFeature with " << (*pc)->size() << " points." << std::endl;
-        } else {
-            std::cout << "Feature is not a PointCloud." << std::endl;
-        }
-    }
+void PointCloudFeature::print() const
+{
+  if (auto * pc = std::get_if<pcl::PointCloud<pcl::PointXYZ>::Ptr>(&feature_data)) {
+    std::cout << "PointCloudFeature with " << (*pc)->size() << " points." << std::endl;
+  } else {
+    std::cout << "Feature is not a PointCloud." << std::endl;
+  }
+}
 
-} // namespace antikythera
+}  // namespace antikythera

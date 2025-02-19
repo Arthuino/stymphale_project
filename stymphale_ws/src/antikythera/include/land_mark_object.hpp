@@ -19,55 +19,66 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-// 
+//
 // @file land_mark_object.hpp
 // @brief This file contains the header of the LandMarkObject class
 //
 
-#ifndef LAND_MARK_OBJECT_HPP
-#define LAND_MARK_OBJECT_HPP
+#ifndef LAND_MARK_OBJECT_HPP_
+#define LAND_MARK_OBJECT_HPP_
 
-#include <string>
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
+
+#include <string>
+#include <vector>
+#include <memory>
 
 #include "land_mark_feature.hpp"
 // message includes
 #include "antikythera_msgs/msg/land_mark_object.hpp"
 
 
-// TODO : Implement the toROSmsg and fromROSMsg method
+// TODO(arthuino) : Implement the toROSmsg and fromROSMsg method
 
 
-namespace antikythera {
-    class LandMarkObject {
-    public:
-        LandMarkObject() = default;
-        LandMarkObject(int id);
-        LandMarkObject(int id, const std::string& label);
+namespace antikythera
+{
+class LandMarkObject
+{
+public:
+  LandMarkObject() = default;
+  explicit LandMarkObject(int id);
+  LandMarkObject(int id, const std::string & label);
 
-        void print() const;
-        // Getters
-        [[nodiscard]] int get_id() const noexcept;
-        [[nodiscard]] const std::string& get_label() const noexcept;
-        [[nodiscard]] const std::vector<std::shared_ptr<LandMarkFeature>>& get_features() const noexcept;
+  void print() const;
+  // Getters
+  [[nodiscard]] int get_id() const noexcept;
+  [[nodiscard]] const std::string & get_label() const noexcept;
+  [[nodiscard]] const std::vector<
+    std::shared_ptr<LandMarkFeature>
+  > & get_features() const noexcept;
 
-        // Setters
-        void set_label(const std::string& label);
-        void add_feature(std::shared_ptr<LandMarkFeature> feature);
-        void remove_feature(size_t index);  // Removes a feature by index
+  // Setters
+  void set_label(const std::string & label);
+  void add_feature(std::shared_ptr<LandMarkFeature> feature);
+  void remove_feature(size_t index);  // Removes a feature by index
 
-        // ROS serialization methods
-        static void toROSMsg(const LandMarkObject& land_mark_object, antikythera_msgs::msg::LandMarkObject& msg);
-        static void fromROSMsg(const antikythera_msgs::msg::LandMarkObject& msg, LandMarkObject& land_mark_object);
+  // ROS serialization methods
+  static void toROSMsg(
+    const LandMarkObject & land_mark_object,
+    antikythera_msgs::msg::LandMarkObject & msg);
 
-    private:
-        int id;
-        std::string label;
-        std::vector<std::shared_ptr<LandMarkFeature>> features;  // Store multiple feature types
+  static void fromROSMsg(
+    const antikythera_msgs::msg::LandMarkObject & msg,
+    LandMarkObject & land_mark_object);
 
-    };
-} // namespace antikythera
+private:
+  int id;
+  std::string label;
+  std::vector<std::shared_ptr<LandMarkFeature>> features;  // Store multiple feature types
+};
+}  // namespace antikythera
 
-#endif // LAND_MARK_OBJECT_HPP
+#endif  // LAND_MARK_OBJECT_HPP_

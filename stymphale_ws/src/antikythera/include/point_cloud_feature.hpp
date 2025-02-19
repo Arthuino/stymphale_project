@@ -24,27 +24,27 @@
 // @brief This file contains the definition of the PointCloudFeature class
 //
 
+#ifndef POINT_CLOUD_FEATURE_HPP_
+#define POINT_CLOUD_FEATURE_HPP_
 
-#ifndef POINT_CLOUD_FEATURE_HPP
-#define POINT_CLOUD_FEATURE_HPP
-
-#include "land_mark_feature.hpp"
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <iostream>
+#include "land_mark_feature.hpp"
 
-namespace antikythera {
+namespace antikythera
+{
 
-    class PointCloudFeature : public LandMarkFeature {
-    public:
-        // Constructor
-        PointCloudFeature(const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud)
-            : LandMarkFeature("PointCloud", cloud) {}
+class PointCloudFeature : public LandMarkFeature
+{
+public:
+  // Constructor
+  explicit PointCloudFeature(const pcl::PointCloud<pcl::PointXYZ>::Ptr & cloud)
+  : LandMarkFeature("PointCloud", cloud) {}
 
-        // Correctly declare the print function
-        void print() const override;
-    };
+  // Correctly declare the print function
+  void print() const override;
+};
+}  // namespace antikythera
 
-} // namespace antikythera
-
-#endif // POINT_CLOUD_FEATURE_HPP
+#endif  // POINT_CLOUD_FEATURE_HPP_

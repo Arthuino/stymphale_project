@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-// 
+//
 // @file land_mark_object.cpp
 // @brief This file contains the implementation of the LandMarkObject class
 //
@@ -35,74 +35,89 @@
 
 #include "land_mark_feature.hpp"
 
-// TODO : Implement the toROSMsg and fromROSMsg method
+// TODO(arthuino) : Implement the toROSMsg and fromROSMsg method
 
-namespace antikythera {
-    
-    // Constructors
-    LandMarkObject::LandMarkObject(int id) 
-        : id(id), label("default") {}
+namespace antikythera
+{
 
-    LandMarkObject::LandMarkObject(int id, const std::string& label) 
-        : id(id), label(label) {}
+// Constructors
+LandMarkObject::LandMarkObject(int id)
+: id(id), label("default") {}
 
-    // Print
-    void LandMarkObject::print() const {
-        std::cout << "LandMarkObject ID: " << id << ", Label: " << label << std::endl;
-        std::cout << "Features: " << features.size() << std::endl;
-        for (const auto& feature : features) {
-            feature->print();
-        }
-    }
+LandMarkObject::LandMarkObject(int id, const std::string & label)
+: id(id), label(label) {}
 
-    // Getters
-    int LandMarkObject::get_id() const noexcept {
-        return id;
-    }
+// Print
+void LandMarkObject::print() const
+{
+  std::cout << "LandMarkObject ID: " << id << ", Label: " << label << std::endl;
+  std::cout << "Features: " << features.size() << std::endl;
+  for (const auto & feature : features) {
+    feature->print();
+  }
+}
 
-    const std::string& LandMarkObject::get_label() const noexcept {
-        return label;
-    }
+// Getters
+int LandMarkObject::get_id() const noexcept
+{
+  return id;
+}
 
-    const std::vector<std::shared_ptr<LandMarkFeature>>& LandMarkObject::get_features() const noexcept {
-        return features;
-    }
+const std::string & LandMarkObject::get_label()
+const noexcept
+{
+  return label;
+}
 
-    // Setters
-    void LandMarkObject::set_label(const std::string& label) {
-        this->label = label;
-    }
+const std::vector<std::shared_ptr<LandMarkFeature>> & LandMarkObject::get_features()
+const noexcept
+{
+  return features;
+}
 
-    void LandMarkObject::add_feature(std::shared_ptr<LandMarkFeature> feature) {
-        features.push_back(std::move(feature));
-    }
+// Setters
+void LandMarkObject::set_label(const std::string & label)
+{
+  this->label = label;
+}
 
-    void LandMarkObject::remove_feature(size_t index) {
-        if (index < features.size()) {
-            features.erase(features.begin() + index);
-        } else {
-            std::cerr << "Error: Feature index out of bounds." << std::endl;
-        }
-    }
+void LandMarkObject::add_feature(std::shared_ptr<LandMarkFeature> feature)
+{
+  features.push_back(std::move(feature));
+}
 
+void LandMarkObject::remove_feature(size_t index)
+{
+  if (index < features.size()) {
+    features.erase(features.begin() + index);
+  } else {
+    std::cerr << "Error: Feature index out of bounds." << std::endl;
+  }
+}
 
-    void LandMarkObject::toROSMsg(const LandMarkObject& land_mark_object, antikythera_msgs::msg::LandMarkObject& msg) {
-        msg.id = land_mark_object.get_id();
-        msg.label = land_mark_object.get_label();
-        for (const auto& feature : land_mark_object.get_features()) {
-            antikythera_msgs::msg::LandMarkFeature feature_msg;
-            LandMarkFeature::toROSMsg(*feature, feature_msg);
-            msg.features.push_back(feature_msg);
-        }
-    }
-    
-    void LandMarkObject::fromROSMsg(const antikythera_msgs::msg::LandMarkObject& msg, LandMarkObject& land_mark_object){
-        land_mark_object = LandMarkObject(msg.id, msg.label);
-        for (const auto& feature_msg : msg.features) {
-            std::shared_ptr<LandMarkFeature> feature = std::make_shared<LandMarkFeature>();
-            LandMarkFeature::fromROSMsg(feature_msg, *feature);
-            land_mark_object.add_feature(feature);
-        }
-    }
-    
-} // namespace antikythera
+void LandMarkObject::toROSMsg(
+  const LandMarkObject & land_mark_object,
+  antikythera_msgs::msg::LandMarkObject & msg)
+{
+  msg.id = land_mark_object.get_id();
+  msg.label = land_mark_object.get_label();
+  for (const auto & feature : land_mark_object.get_features()) {
+    antikythera_msgs::msg::LandMarkFeature feature_msg;
+    LandMarkFeature::toROSMsg(*feature, feature_msg);
+    msg.features.push_back(feature_msg);
+  }
+}
+
+void LandMarkObject::fromROSMsg(
+  const antikythera_msgs::msg::LandMarkObject & msg,
+  LandMarkObject & land_mark_object)
+{
+  land_mark_object = LandMarkObject(msg.id, msg.label);
+  for (const auto & feature_msg : msg.features) {
+    std::shared_ptr<LandMarkFeature> feature = std::make_shared<LandMarkFeature>();
+    LandMarkFeature::fromROSMsg(feature_msg, *feature);
+    land_mark_object.add_feature(feature);
+  }
+}
+
+}  // namespace antikythera

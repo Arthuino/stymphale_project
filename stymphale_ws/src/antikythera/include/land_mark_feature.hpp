@@ -24,8 +24,8 @@
 // @brief This file contains the definition of the abstract LandMarkFeature class
 //
 
-#ifndef LAND_MARK_FEATURE_HPP
-#define LAND_MARK_FEATURE_HPP
+#ifndef LAND_MARK_FEATURE_HPP_
+#define LAND_MARK_FEATURE_HPP_
 
 #include <pcl/point_types.h>
 #include <pcl_conversions/pcl_conversions.h>
@@ -38,44 +38,51 @@
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <antikythera_msgs/msg/land_mark_feature.hpp>
 
-namespace antikythera {
+namespace antikythera
+{
 
-    // Alias for variant holding possible feature types
-    using FeatureData = std::variant<
-        pcl::PointCloud<pcl::PointXYZ>::Ptr,     // PointCloud
-        geometry_msgs::msg::TransformStamped   // ROS TransformStamped
-    >;
+// Alias for variant holding possible feature types
+using FeatureData = std::variant<
+  pcl::PointCloud<pcl::PointXYZ>::Ptr,     // PointCloud
+  geometry_msgs::msg::TransformStamped   // ROS TransformStamped
+>;
 
-    // Abstract class definition for a feature of a LandMarkObject
-    class LandMarkFeature {
-    public:
+// Abstract class definition for a feature of a LandMarkObject
+class LandMarkFeature
+{
+public:
+  virtual ~LandMarkFeature();
 
-        virtual ~LandMarkFeature();
+  // void constructor
+  LandMarkFeature();
 
-        // void constructor
-        LandMarkFeature();
+  explicit LandMarkFeature(const std::string & feature_type);
 
-        LandMarkFeature(const std::string& feature_type);
+  LandMarkFeature(const std::string & feature_type, FeatureData feature_data);
 
-        LandMarkFeature(const std::string& feature_type, FeatureData feature_data);
+  virtual void print() const;  // Print details of the feature
 
-        virtual void print() const;  // Print details of the feature
+  // Feature Data
+  void set_feature(FeatureData feature);
+  FeatureData get_feature() const;
 
-        // Feature Data
-        void set_feature(FeatureData feature);
-        FeatureData get_feature() const;
+  // Feature type
+  std::string get_feature_type() const;
 
-        // Feature type
-        std::string get_feature_type() const;
+  // ROS message conversion methods
+  static void toROSMsg(
+    const LandMarkFeature & landMarkFeature,
+    antikythera_msgs::msg::LandMarkFeature & msg);
 
-        // ROS message conversion methods
-        static void toROSMsg(const LandMarkFeature& landMarkFeature, antikythera_msgs::msg::LandMarkFeature& msg);
-        static void fromROSMsg(const antikythera_msgs::msg::LandMarkFeature& msg, LandMarkFeature& landMarkFeature);
+  static void fromROSMsg(
+    const antikythera_msgs::msg::LandMarkFeature & msg,
+    LandMarkFeature & landMarkFeature
+  );
 
-    protected:
-        std::string feature_type;
-        FeatureData feature_data;
-    };
-} // namespace antikythera
+protected:
+  std::string feature_type;
+  FeatureData feature_data;
+};
+}  // namespace antikythera
 
-#endif // LAND_MARK_FEATURE_HPP
+#endif  // LAND_MARK_FEATURE_HPP_

@@ -39,7 +39,7 @@ docker compose run --remove-orphans cpp_ros_tester
 View test results
 
 ```bash
-colcon test-result --all --verbose
+docker compose run --remove-orphans cpp_ros_test_collector
 ```
 
 ## Run
