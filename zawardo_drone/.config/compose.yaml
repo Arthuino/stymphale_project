@@ -74,14 +74,14 @@ services:
         target: /home/ardupilotuser/stymphale_ws/  # Mount stymphale_ws for building
     command: colcon test --ctest-args tests
 
-  cpp_ros_test_collector:
+  cpp_ros_test_results:
     build:
       context: .
       dockerfile: cpp_ros_builder/cpp_ros_builder_docker
       args:
         - ~/stymphale_project/stymphale_ws
     image: arthuino/stymphale-cpp_ros_builder:latest
-    container_name: cpp_ros_test-collector
+    container_name: cpp_ros_test_results
     network_mode: host
     restart: "no"
     volumes:

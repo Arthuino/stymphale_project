@@ -6,14 +6,14 @@ The purpose of this module is to work on the implementation of a SLAM algorithm.
 
 Rebuild builder Docker (ex: after adding new dependencies)
 
-```bash
-docker compose up --remove-orphans cpp_ros_builder
-```
-
 Build Stymphale workspace
 
 ```bash
 docker compose up --remove-orphans cpp_ros_builder
+```
+
+```bash
+docker compose build --remove-orphans cpp_ros_builder
 ```
 
 Micro-ROS Agent
@@ -33,17 +33,17 @@ docker compose run ardupilot_ros_env
 Run tests
 
 ```bash
-docker compose run --remove-orphans cpp_ros_tester
+docker compose up --remove-orphans cpp_ros_tester
 ```
 
 View test results
 
 ```bash
-docker compose run --remove-orphans cpp_ros_test_collector
+docker compose up --remove-orphans cpp_ros_test_results
 ```
 
 ## Run
 
 ```bash
-ros2 run antikythera antikythera_node
+ros2 run antikythera antikythera_land_mark_slicer
 ```
