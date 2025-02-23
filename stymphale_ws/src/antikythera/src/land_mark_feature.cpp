@@ -51,7 +51,7 @@ std::string LandMarkFeature::get_feature_type() const
   return feature_type;
 }
 
-FeatureData LandMarkFeature::get_feature() const
+FeatureData LandMarkFeature::get_feature_data() const
 {
   return feature_data;
 }
@@ -79,16 +79,16 @@ void LandMarkFeature::toROSMsg(
   msg.feature_type = landMarkFeature.get_feature_type();
   // Set Flags
   msg.is_point_cloud = std::holds_alternative<pcl::PointCloud<pcl::PointXYZ>::Ptr>(
-    landMarkFeature.get_feature()
+    landMarkFeature.get_feature_data()
   );
 
   msg.is_transform = std::holds_alternative<geometry_msgs::msg::TransformStamped>(
-    landMarkFeature.get_feature()
+    landMarkFeature.get_feature_data()
   );
 
   // Set Feature Data
   if (msg.is_point_cloud) {       // PointCloud Feature
-    auto cloud = std::get<pcl::PointCloud<pcl::PointXYZ>::Ptr>(landMarkFeature.get_feature());
+    auto cloud = std::get<pcl::PointCloud<pcl::PointXYZ>::Ptr>(landMarkFeature.get_feature_data());
     pcl::toROSMsg(*cloud, msg.point_cloud);
 
   } else if (msg.is_transform) {  // Transform Feature

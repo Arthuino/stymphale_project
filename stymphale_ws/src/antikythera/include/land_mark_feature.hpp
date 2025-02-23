@@ -64,7 +64,7 @@ public:
 
   // Feature Data
   void set_feature(FeatureData feature);
-  FeatureData get_feature() const;
+  FeatureData get_feature_data() const;
 
   // Feature type
   std::string get_feature_type() const;

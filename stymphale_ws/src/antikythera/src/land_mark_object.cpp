@@ -69,7 +69,7 @@ const noexcept
   return label;
 }
 
-const std::vector<std::shared_ptr<LandMarkFeature>> & LandMarkObject::get_features()
+const std::vector<std::shared_ptr<LandMarkFeature>> & LandMarkObject::get_features_object()
 const noexcept
 {
   return features;
@@ -81,12 +81,12 @@ void LandMarkObject::set_label(const std::string & label)
   this->label = label;
 }
 
-void LandMarkObject::add_feature(std::shared_ptr<LandMarkFeature> feature)
+void LandMarkObject::add_feature_object(std::shared_ptr<LandMarkFeature> feature)
 {
   features.push_back(std::move(feature));
 }
 
-void LandMarkObject::remove_feature(size_t index)
+void LandMarkObject::remove_feature_object(size_t index)
 {
   if (index < features.size()) {
     features.erase(features.begin() + index);
@@ -101,7 +101,7 @@ void LandMarkObject::toROSMsg(
 {
   msg.id = land_mark_object.get_id();
   msg.label = land_mark_object.get_label();
-  for (const auto & feature : land_mark_object.get_features()) {
+  for (const auto & feature : land_mark_object.get_features_object()) {
     antikythera_msgs::msg::LandMarkFeature feature_msg;
     LandMarkFeature::toROSMsg(*feature, feature_msg);
     msg.features.push_back(feature_msg);
@@ -116,7 +116,7 @@ void LandMarkObject::fromROSMsg(
   for (const auto & feature_msg : msg.features) {
     std::shared_ptr<LandMarkFeature> feature = std::make_shared<LandMarkFeature>();
     LandMarkFeature::fromROSMsg(feature_msg, *feature);
-    land_mark_object.add_feature(feature);
+    land_mark_object.add_feature_object(feature);
   }
 }
 

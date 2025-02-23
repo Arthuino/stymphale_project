@@ -73,40 +73,12 @@ private:
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr publisher_;
 };
 
-class PointCloudSubscriber : public rclcpp::Node
-{
-public:
-  PointCloudSubscriber()
-  : Node("antikythera_visualizer")
-  {
-    subscription_ = this->create_subscription<sensor_msgs::msg::PointCloud2>(
-      "/antikythera/emulator/point_cloud", 10, std::bind(
-        &PointCloudSubscriber::sub_callback, this, std::placeholders::_1
-    ));
-  }
-
-private:
-  void sub_callback(const sensor_msgs::msg::PointCloud2::SharedPtr msg)
-  {
-    pcl::PointCloud<pcl::PointXYZ> cloud;
-    pcl::fromROSMsg(*msg, cloud);
-    printf("Cloud: width = %d, height = %d\n", cloud.width, cloud.height);
-    for (const auto & pt : cloud.points) {
-      printf("\t(%f, %f, %f)\n", pt.x, pt.y, pt.z);
-    }
-  }
-
-  rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr subscription_;
-};
-
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   auto publisher_node = std::make_shared<PointCloudPublisher>();
-  auto subscriber_node = std::make_shared<PointCloudSubscriber>();
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(publisher_node);
-  executor.add_node(subscriber_node);
   executor.spin();
   rclcpp::shutdown();
   return 0;

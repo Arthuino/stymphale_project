@@ -58,12 +58,12 @@ public:
   [[nodiscard]] const std::string & get_label() const noexcept;
   [[nodiscard]] const std::vector<
     std::shared_ptr<LandMarkFeature>
-  > & get_features() const noexcept;
+  > & get_features_object() const noexcept;
 
   // Setters
   void set_label(const std::string & label);
-  void add_feature(std::shared_ptr<LandMarkFeature> feature);
-  void remove_feature(size_t index);  // Removes a feature by index
+  void add_feature_object(std::shared_ptr<LandMarkFeature> feature);
+  void remove_feature_object(size_t index);  // Removes a feature by index
 
   // ROS serialization methods
   static void toROSMsg(
