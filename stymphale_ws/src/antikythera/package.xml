@@ -2,27 +2,27 @@
   <name>antikythera</name>
   <version>0.1.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="vigouroux.art@gmail.com">user</maintainer>
+  <maintainer email="vigouroux.art@gmail.com">Arthur Vigouroux</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+
   <build_depend>rclcpp</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>pcl_ros</build_depend>
+  <build_depend>pcl_conversions</build_depend>
   <build_depend>OpenCV</build_depend>
   <build_depend>Eigen3</build_depend>
-  <build_depend>pcl_1.30</build_depend>
-
   <build_depend>antikythera_msgs</build_depend>
 
   <exec_depend>rclcpp</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>pcl_ros</exec_depend>
+  <exec_depend>pcl_conversions</exec_depend>
   <exec_depend>OpenCV</exec_depend>
   <exec_depend>Eigen3</exec_depend>
-  <exec_depend>pcl_1.30</exec_depend>
   <exec_depend>GTest</exec_depend>
   <exec_depend>antikythera_msgs</exec_depend>
 
@@ -35,3 +35,4 @@
     <build_type>ament_cmake</build_type>
   </export>
 </package>
+

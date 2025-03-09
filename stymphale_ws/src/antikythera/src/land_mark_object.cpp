@@ -32,10 +32,10 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <typeinfo>
 
 #include "land_mark_feature.hpp"
-
-// TODO(arthuino) : Implement the toROSMsg and fromROSMsg method
+#include "point_cloud_feature.hpp"
 
 namespace antikythera
 {
@@ -53,6 +53,9 @@ void LandMarkObject::print() const
   std::cout << "LandMarkObject ID: " << id << ", Label: " << label << std::endl;
   std::cout << "Features: " << features.size() << std::endl;
   for (const auto & feature : features) {
+    // get class name of feature
+    std::cout << "Class of Object feature : " << typeid(*feature).name() << std::endl;
+    
     feature->print();
   }
 }
@@ -69,11 +72,8 @@ const noexcept
   return label;
 }
 
-const std::vector<std::shared_ptr<LandMarkFeature>> & LandMarkObject::get_features_object()
-const noexcept
-{
-  return features;
-}
+
+
 
 // Setters
 void LandMarkObject::set_label(const std::string & label)
@@ -101,9 +101,10 @@ void LandMarkObject::toROSMsg(
 {
   msg.id = land_mark_object.get_id();
   msg.label = land_mark_object.get_label();
-  for (const auto & feature : land_mark_object.get_features_object()) {
+  // TODO(arthuino) : Adapt to new feature structure
+  for (const auto & feature : land_mark_object.get_features_object<LandMarkFeature>()) {
     antikythera_msgs::msg::LandMarkFeature feature_msg;
-    LandMarkFeature::toROSMsg(*feature, feature_msg);
+    LandMarkFeature::toROSMsg(feature, feature_msg);
     msg.features.push_back(feature_msg);
   }
 }
@@ -112,10 +113,20 @@ void LandMarkObject::fromROSMsg(
   const antikythera_msgs::msg::LandMarkObject & msg,
   LandMarkObject & land_mark_object)
 {
+  // TODO(arthuino) : Adapt to new feature structure
   land_mark_object = LandMarkObject(msg.id, msg.label);
   for (const auto & feature_msg : msg.features) {
-    std::shared_ptr<LandMarkFeature> feature = std::make_shared<LandMarkFeature>();
-    LandMarkFeature::fromROSMsg(feature_msg, *feature);
+    std::shared_ptr<LandMarkFeature> feature;
+    // Choose feature class depending on feature type
+    if(feature_msg.is_point_cloud){
+      feature = std::make_shared<PointCloudFeature>();
+    }
+    if(feature_msg.is_transform){
+      printf("Transform feature not implemented yet\n");
+      return;
+    }
+    // Add feature to object
+    LandMarkFeature::fromROSMsg(feature_msg, feature);
     land_mark_object.add_feature_object(feature);
   }
 }

@@ -30,13 +30,33 @@
 
 namespace antikythera
 {
-
+// PRINT
 void PointCloudFeature::print() const
 {
-  if (auto * pc = std::get_if<pcl::PointCloud<pcl::PointXYZ>::Ptr>(&feature_data)) {
-    std::cout << "PointCloudFeature with " << (*pc)->size() << " points." << std::endl;
-  } else {
-    std::cout << "Feature is not a PointCloud." << std::endl;
+  std::cout << "PointCloudFeature with " << cloud->size() << " points." << std::endl;
+}
+
+// GETTERS
+std::shared_ptr<void> PointCloudFeature::get_feature_data() const
+{
+  return cloud;
+}
+
+std::string PointCloudFeature::get_feature_type() const
+{
+  return std::string(FEATURE_TYPE_POINT_CLOUD);
+}
+
+// SETTERS
+void PointCloudFeature::set_feature(const std::shared_ptr<std::any> & feature_data)
+{
+  try
+  {
+    cloud = std::any_cast<std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>>>(feature_data);
+  }
+  catch (const std::bad_any_cast& e)
+  {
+    std::cerr << "Error: feature_data is not a valid PointCloud pointer!" << std::endl;
   }
 }
 

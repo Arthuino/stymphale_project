@@ -38,12 +38,28 @@ namespace antikythera
 class PointCloudFeature : public LandMarkFeature
 {
 public:
-  // Constructor
+  // CONSTRUCTORS
+  PointCloudFeature()
+  : LandMarkFeature(FEATURE_TYPE_POINT_CLOUD), cloud(std::make_shared<pcl::PointCloud<pcl::PointXYZ>>()) {};
+
   explicit PointCloudFeature(const pcl::PointCloud<pcl::PointXYZ>::Ptr & cloud)
-  : LandMarkFeature("PointCloud", cloud) {}
+  : LandMarkFeature(FEATURE_TYPE_POINT_CLOUD), cloud(cloud) {};
+
+  // DESCTRUCTOR
+  ~PointCloudFeature() override = default;
 
   // Correctly declare the print function
   void print() const override;
+
+  // getter
+  [[nodiscard]] std::shared_ptr<void> get_feature_data() const override;
+  [[nodiscard]] std::string get_feature_type() const override;
+
+  // setter
+  void set_feature(const std::shared_ptr<std::any> & feature_data) override;
+
+private:
+  std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud;
 };
 }  // namespace antikythera
 

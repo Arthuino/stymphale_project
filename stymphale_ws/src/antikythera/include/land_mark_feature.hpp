@@ -33,55 +33,55 @@
 
 #include <string>
 #include <iostream>
-#include <variant>
+#include <any>
 
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <antikythera_msgs/msg/land_mark_feature.hpp>
 
+// TODO(arthuino) : Check for any direct instantiation of Abstract class LandMarkFeature
+
 namespace antikythera
 {
 
-// Alias for variant holding possible feature types
-using FeatureData = std::variant<
-  pcl::PointCloud<pcl::PointXYZ>::Ptr,     // PointCloud
-  geometry_msgs::msg::TransformStamped   // ROS TransformStamped
->;
+constexpr const char* FEATURE_TYPE_UNKNOWN = "Unknown";
+constexpr const char* FEATURE_TYPE_POINT_CLOUD = "PointCloud";
+constexpr const char* FEATURE_TYPE_TRANSFORM = "Transform";
 
 // Abstract class definition for a feature of a LandMarkObject
 class LandMarkFeature
 {
 public:
-  virtual ~LandMarkFeature();
 
-  // void constructor
-  LandMarkFeature();
+  // CONSTRUCTORS
+  LandMarkFeature() = default;
 
   explicit LandMarkFeature(const std::string & feature_type);
 
-  LandMarkFeature(const std::string & feature_type, FeatureData feature_data);
+  // DESTRUCTOR
+  virtual ~LandMarkFeature() = default;
 
+  // PRINT
   virtual void print() const;  // Print details of the feature
 
-  // Feature Data
-  void set_feature(FeatureData feature);
-  FeatureData get_feature_data() const;
+  // GETTERS
+  [[nodiscard]] virtual std::shared_ptr<void> get_feature_data() const = 0; 
+  [[nodiscard]] virtual std::string get_feature_type() const = 0;
 
-  // Feature type
-  std::string get_feature_type() const;
+  // SETTERS
+  virtual void set_feature(const std::shared_ptr<std::any> & feature_data) = 0;  
 
-  // ROS message conversion methods
+  // ROS CONVERSIONS
   static void toROSMsg(
-    const LandMarkFeature & landMarkFeature,
-    antikythera_msgs::msg::LandMarkFeature & msg);
+    const std::shared_ptr<LandMarkFeature>& landMarkFeature,
+    antikythera_msgs::msg::LandMarkFeature& msg);
 
   static void fromROSMsg(
-    const antikythera_msgs::msg::LandMarkFeature & msg,
-    LandMarkFeature & landMarkFeature
-  );
+    const antikythera_msgs::msg::LandMarkFeature& msg,
+    std::shared_ptr<LandMarkFeature>& landMarkFeature);
+
 
 protected:
   std::string feature_type;
-  FeatureData feature_data;
 };
 }  // namespace antikythera
 

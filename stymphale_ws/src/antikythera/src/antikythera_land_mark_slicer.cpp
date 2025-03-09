@@ -90,8 +90,6 @@ private:
     pcl::fromROSMsg(*msg, *cloud);
     auto cluster_list = segmentation_Euclidian_Cluster_Extraction(cloud);
 
-    // TODO(arthuino) : create a visualizer somehow
-
     std::vector<std::shared_ptr<antikythera::LandMarkObject>> land_mark_map;
 
     int i = 0;
