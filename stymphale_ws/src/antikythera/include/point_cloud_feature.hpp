@@ -22,6 +22,7 @@
 //
 // @file point_cloud_feature.hpp
 // @brief This file contains the definition of the PointCloudFeature class
+// This feature is a PCL point cloud. Point cloud can be from a LIDAR, a stereo camera, etc.
 //
 
 #ifndef POINT_CLOUD_FEATURE_HPP_
@@ -57,11 +58,15 @@ public:
   void print() const override;
 
   // getter
-  [[nodiscard]] std::shared_ptr<void> get_feature_data() const override;
-  [[nodiscard]] std::string get_feature_type() const override;
+  std::shared_ptr<void> get_feature_data() const override;
 
   // setter
-  void set_feature(const std::shared_ptr<std::any> & feature_data) override;
+  void set_feature_data(const std::shared_ptr<std::any> & feature_data) override;
+
+  // ROS CONVERSIONS
+  antikythera_msgs::msg::LandMarkFeature toROSMsg() const override;
+
+  void fromROSMsg(const antikythera_msgs::msg::LandMarkFeature & msg) override;
 
 private:
   std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud;

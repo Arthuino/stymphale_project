@@ -22,6 +22,8 @@
 //
 // @file land_mark_feature.hpp
 // @brief This file contains the definition of the abstract LandMarkFeature class
+// A land_mark_feature is a caracteristic of an object in the environment/map
+// It can be a point cloud, a transform, etc. depending on the application and the sensor used
 //
 
 #ifndef LAND_MARK_FEATURE_HPP_
@@ -39,8 +41,6 @@
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <antikythera_msgs/msg/land_mark_feature.hpp>
 
-// TODO(arthuino) : Check for any direct instantiation of Abstract class LandMarkFeature
-
 namespace antikythera
 {
 
@@ -55,29 +55,29 @@ public:
   // CONSTRUCTORS
   LandMarkFeature() = default;
 
-  explicit LandMarkFeature(const std::string & feature_type);
+  explicit LandMarkFeature(const std::string & feature_type)
+  : feature_type(feature_type) {}
 
   // DESTRUCTOR
   virtual ~LandMarkFeature() = default;
 
   // PRINT
-  virtual void print() const;  // Print details of the feature
+  virtual void print() const = 0;  // Print details of the feature
 
-  // GETTERS
-  [[nodiscard]] virtual std::shared_ptr<void> get_feature_data() const = 0;
-  [[nodiscard]] virtual std::string get_feature_type() const = 0;
+  // DATA ACCESS
+  virtual std::shared_ptr<void> get_feature_data() const = 0;
+  virtual void set_feature_data(const std::shared_ptr<std::any> & feature_data) = 0;
 
-  // SETTERS
-  virtual void set_feature(const std::shared_ptr<std::any> & feature_data) = 0;
+  // FEATURE TYPE ACCESS
+  std::string get_feature_type() const {return std::string(feature_type);}
+  void set_feature_type(const std::string & feature_type) {this->feature_type = feature_type;}
 
   // ROS CONVERSIONS
-  static void toROSMsg(
-    const std::shared_ptr<LandMarkFeature> & landMarkFeature,
-    antikythera_msgs::msg::LandMarkFeature & msg);
+  // Get the ROS message corresponding to the feature
+  virtual antikythera_msgs::msg::LandMarkFeature toROSMsg() const = 0;
 
-  static void fromROSMsg(
-    const antikythera_msgs::msg::LandMarkFeature & msg,
-    std::shared_ptr<LandMarkFeature> & landMarkFeature);
+  // Set the feature from a ROS message
+  virtual void fromROSMsg(const antikythera_msgs::msg::LandMarkFeature & msg) = 0;
 
 protected:
   std::string feature_type;

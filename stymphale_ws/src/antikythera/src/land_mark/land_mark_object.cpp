@@ -73,8 +73,6 @@ const noexcept
 }
 
 
-
-
 // Setters
 void LandMarkObject::set_label(const std::string & label)
 {
@@ -101,10 +99,9 @@ void LandMarkObject::toROSMsg(
 {
   msg.id = land_mark_object.get_id();
   msg.label = land_mark_object.get_label();
-  // TODO(arthuino) : Adapt to new feature structure
+
   for (const auto & feature : land_mark_object.get_features_object<LandMarkFeature>()) {
-    antikythera_msgs::msg::LandMarkFeature feature_msg;
-    LandMarkFeature::toROSMsg(feature, feature_msg);
+    antikythera_msgs::msg::LandMarkFeature feature_msg = feature->toROSMsg();
     msg.features.push_back(feature_msg);
   }
 }
@@ -113,20 +110,18 @@ void LandMarkObject::fromROSMsg(
   const antikythera_msgs::msg::LandMarkObject & msg,
   LandMarkObject & land_mark_object)
 {
-  // TODO(arthuino) : Adapt to new feature structure
   land_mark_object = LandMarkObject(msg.id, msg.label);
   for (const auto & feature_msg : msg.features) {
     std::shared_ptr<LandMarkFeature> feature;
-    // Choose feature class depending on feature type
-    if(feature_msg.is_point_cloud){
+    // Instantiate the correct feature type
+    if (feature_msg.feature_type == FEATURE_TYPE_POINT_CLOUD) {
       feature = std::make_shared<PointCloudFeature>();
+    } else {
+      std::cerr << "Error: Unknown feature type." << std::endl;
+      continue;
     }
-    if(feature_msg.is_transform){
-      printf("Transform feature not implemented yet\n");
-      return;
-    }
-    // Add feature to object
-    LandMarkFeature::fromROSMsg(feature_msg, feature);
+
+    feature->fromROSMsg(feature_msg);
     land_mark_object.add_feature_object(feature);
   }
 }

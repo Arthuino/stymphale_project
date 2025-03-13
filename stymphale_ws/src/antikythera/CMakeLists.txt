@@ -33,9 +33,8 @@ add_definitions(${PCL_DEFINITIONS})
 # VARIABLES
 set(ANTIKYTHERA_LIBS ${OpenCV_LIBRARIES} ${Eigen3_LIBRARIES} ${PCL_LIBRARIES})
 
-set(land_mark_object_SRC src/land_mark_object.cpp
-                          src/land_mark_feature.cpp
-                          src/point_cloud_feature.cpp)
+set(land_mark_object_SRC src/land_mark/land_mark_object.cpp
+                          src/land_mark/point_cloud_feature.cpp)
 set(land_mark_object_DEPS std_msgs
                           sensor_msgs
                           pcl_conversions

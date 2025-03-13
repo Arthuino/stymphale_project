@@ -46,7 +46,7 @@ public:
   // constructor
   LandMarkVisualizer()
   : Node("landMarkVisualizer"),
-  vis2_("LandMark Visualizer")
+    vis2_("LandMark Visualizer")
   {
     // create subscriber
     subscriber_ = this->create_subscription<antikythera_msgs::msg::LandMarkObject>(
@@ -75,26 +75,21 @@ private:
     }
 
     for (const auto & featureObject : land_mark_object.get_features_object
-                                                              <antikythera::PointCloudFeature>()) {
-      std::cout << "PointCloudFeature with "
-                << std::static_pointer_cast<pcl::PointCloud<pcl::PointXYZ>>(
-                                                          featureObject->get_feature_data()
-                                                                          )->size()
-                << " points." << std::endl;
-
+      <antikythera::PointCloudFeature>())
+    {
       // Ensure featureObject is not null
       if (!featureObject) {
-          std::cerr << "Warning: Null feature object encountered!" << std::endl;
-          continue;
+        std::cerr << "Warning: Null feature object encountered!" << std::endl;
+        continue;
       }
 
       // Extract cloud from feature
       auto cloud = std::static_pointer_cast<pcl::PointCloud<pcl::PointXYZ>>(
-                                                              featureObject->get_feature_data());
+        featureObject->get_feature_data());
 
       if (!cloud) {
-          std::cerr << "Warning: Null point cloud feature data!" << std::endl;
-          continue;
+        std::cerr << "Warning: Null point cloud feature data!" << std::endl;
+        continue;
       }
 
       // convert to RGB for visualization
@@ -106,7 +101,6 @@ private:
     }
   }
 };
-
 
 
 int main(int argc, char * argv[])

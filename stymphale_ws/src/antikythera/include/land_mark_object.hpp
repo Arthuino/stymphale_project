@@ -22,6 +22,8 @@
 //
 // @file land_mark_object.hpp
 // @brief This file contains the header of the LandMarkObject class
+// A land_mark_object store a collection of features
+// describe a specific object of the environment/map
 //
 
 #ifndef LAND_MARK_OBJECT_HPP_
@@ -69,9 +71,9 @@ public:
   {
     std::vector<std::shared_ptr<FeatureType>> specific_features;
 
-    for (const auto & feature : features){
-      if (auto casted_feature = std::dynamic_pointer_cast<FeatureType>(feature)){
-          specific_features.push_back(casted_feature);
+    for (const auto & feature : features) {
+      if (auto casted_feature = std::dynamic_pointer_cast<FeatureType>(feature)) {
+        specific_features.push_back(casted_feature);
       }
     }
     return specific_features;
