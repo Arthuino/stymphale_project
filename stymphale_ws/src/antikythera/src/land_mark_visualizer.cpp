@@ -63,9 +63,8 @@ private:
 
   void on_land_mark_received(const antikythera_msgs::msg::LandMarkObject::SharedPtr msg)
   {
-
     printf("Received LandMarkObject with ID: %d\n", msg->id);
-    
+
     antikythera::LandMarkObject land_mark_object(msg->id);
     antikythera::LandMarkObject::fromROSMsg(*msg, land_mark_object);
     land_mark_object.print();
@@ -75,19 +74,24 @@ private:
       feature->print();
     }
 
-    for (const auto & featureObject : land_mark_object.get_features_object<antikythera::PointCloudFeature>()) {
+    for (const auto & featureObject : land_mark_object.get_features_object
+                                                              <antikythera::PointCloudFeature>()) {
+      std::cout << "PointCloudFeature with "
+                << std::static_pointer_cast<pcl::PointCloud<pcl::PointXYZ>>(
+                                                          featureObject->get_feature_data()
+                                                                          )->size()
+                << " points." << std::endl;
 
-      std::cout << "PointCloudFeature with " << std::static_pointer_cast<pcl::PointCloud<pcl::PointXYZ>>(featureObject->get_feature_data())->size() << " points." << std::endl;
-      
       // Ensure featureObject is not null
       if (!featureObject) {
           std::cerr << "Warning: Null feature object encountered!" << std::endl;
           continue;
       }
-  
+
       // Extract cloud from feature
-      auto cloud = std::static_pointer_cast<pcl::PointCloud<pcl::PointXYZ>>(featureObject->get_feature_data()); 
-  
+      auto cloud = std::static_pointer_cast<pcl::PointCloud<pcl::PointXYZ>>(
+                                                              featureObject->get_feature_data());
+
       if (!cloud) {
           std::cerr << "Warning: Null point cloud feature data!" << std::endl;
           continue;
@@ -97,7 +101,8 @@ private:
       pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_rgb(new pcl::PointCloud<pcl::PointXYZRGB>);
       pcl::copyPointCloud(*cloud, *cloud_rgb);
 
-      vis2_.addPointCloud(cloud_rgb, "cloud_" + std::to_string(msg->id));  // add point cloud to visualizer
+      // add point cloud to visualizer
+      vis2_.addPointCloud(cloud_rgb, "cloud_" + std::to_string(msg->id));
     }
   }
 };

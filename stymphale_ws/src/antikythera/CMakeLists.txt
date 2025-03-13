@@ -34,8 +34,8 @@ add_definitions(${PCL_DEFINITIONS})
 set(ANTIKYTHERA_LIBS ${OpenCV_LIBRARIES} ${Eigen3_LIBRARIES} ${PCL_LIBRARIES})
 
 set(land_mark_object_SRC src/land_mark_object.cpp
-                         src/land_mark_feature.cpp
-                         src/point_cloud_feature.cpp)
+                          src/land_mark_feature.cpp
+                          src/point_cloud_feature.cpp)
 set(land_mark_object_DEPS std_msgs
                           sensor_msgs
                           pcl_conversions
@@ -104,12 +104,12 @@ if(BUILD_TESTING)
 
   ament_lint_auto_find_test_dependencies()
 
+  # PLACEHOLDER TEST
   ament_add_gtest(${PROJECT_NAME}_test test/dev_test.cpp)
   target_include_directories(${PROJECT_NAME}_test PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
   )
-
   ament_target_dependencies(${PROJECT_NAME}_test
     std_msgs
     rclcpp
@@ -117,11 +117,28 @@ if(BUILD_TESTING)
     pcl_ros
     pcl_conversions
   )
-
   target_link_libraries(${PROJECT_NAME}_test ${ANTIKYTHERA_LIBS})
 
-  # install test
-  install(TARGETS ${PROJECT_NAME}_test
+
+
+  ament_add_gtest(${PROJECT_NAME}_point_cloud_feature_test test/point_cloud_feature_test.cpp
+                                                            ${land_mark_object_SRC})
+  target_include_directories(${PROJECT_NAME}_test PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+  )
+  ament_target_dependencies(${PROJECT_NAME}_point_cloud_feature_test
+    std_msgs
+    rclcpp
+    sensor_msgs
+    pcl_ros
+    pcl_conversions
+  )
+  target_link_libraries(${PROJECT_NAME}_point_cloud_feature_test ${ANTIKYTHERA_LIBS})
+
+
+  # INSTALL TESTS
+  install(TARGETS ${PROJECT_NAME}_test ${PROJECT_NAME}_point_cloud_feature_test
     DESTINATION lib/${PROJECT_NAME})
 endif()
 

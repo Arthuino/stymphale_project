@@ -55,7 +55,7 @@ void LandMarkObject::print() const
   for (const auto & feature : features) {
     // get class name of feature
     std::cout << "Class of Object feature : " << typeid(*feature).name() << std::endl;
-    
+
     feature->print();
   }
 }

@@ -34,6 +34,7 @@
 #include <string>
 #include <iostream>
 #include <any>
+#include <memory>
 
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <antikythera_msgs/msg/land_mark_feature.hpp>
@@ -43,15 +44,14 @@
 namespace antikythera
 {
 
-constexpr const char* FEATURE_TYPE_UNKNOWN = "Unknown";
-constexpr const char* FEATURE_TYPE_POINT_CLOUD = "PointCloud";
-constexpr const char* FEATURE_TYPE_TRANSFORM = "Transform";
+constexpr const char * FEATURE_TYPE_UNKNOWN = "Unknown";
+constexpr const char * FEATURE_TYPE_POINT_CLOUD = "PointCloud";
+constexpr const char * FEATURE_TYPE_TRANSFORM = "Transform";
 
 // Abstract class definition for a feature of a LandMarkObject
 class LandMarkFeature
 {
 public:
-
   // CONSTRUCTORS
   LandMarkFeature() = default;
 
@@ -64,21 +64,20 @@ public:
   virtual void print() const;  // Print details of the feature
 
   // GETTERS
-  [[nodiscard]] virtual std::shared_ptr<void> get_feature_data() const = 0; 
+  [[nodiscard]] virtual std::shared_ptr<void> get_feature_data() const = 0;
   [[nodiscard]] virtual std::string get_feature_type() const = 0;
 
   // SETTERS
-  virtual void set_feature(const std::shared_ptr<std::any> & feature_data) = 0;  
+  virtual void set_feature(const std::shared_ptr<std::any> & feature_data) = 0;
 
   // ROS CONVERSIONS
   static void toROSMsg(
-    const std::shared_ptr<LandMarkFeature>& landMarkFeature,
-    antikythera_msgs::msg::LandMarkFeature& msg);
+    const std::shared_ptr<LandMarkFeature> & landMarkFeature,
+    antikythera_msgs::msg::LandMarkFeature & msg);
 
   static void fromROSMsg(
-    const antikythera_msgs::msg::LandMarkFeature& msg,
-    std::shared_ptr<LandMarkFeature>& landMarkFeature);
-
+    const antikythera_msgs::msg::LandMarkFeature & msg,
+    std::shared_ptr<LandMarkFeature> & landMarkFeature);
 
 protected:
   std::string feature_type;

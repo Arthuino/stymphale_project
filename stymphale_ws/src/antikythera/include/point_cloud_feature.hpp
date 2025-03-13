@@ -29,7 +29,11 @@
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
+
 #include <iostream>
+#include <string>
+#include <memory>
+
 #include "land_mark_feature.hpp"
 
 namespace antikythera
@@ -40,10 +44,11 @@ class PointCloudFeature : public LandMarkFeature
 public:
   // CONSTRUCTORS
   PointCloudFeature()
-  : LandMarkFeature(FEATURE_TYPE_POINT_CLOUD), cloud(std::make_shared<pcl::PointCloud<pcl::PointXYZ>>()) {};
+  : LandMarkFeature(FEATURE_TYPE_POINT_CLOUD),
+    cloud(std::make_shared<pcl::PointCloud<pcl::PointXYZ>>()) {}
 
   explicit PointCloudFeature(const pcl::PointCloud<pcl::PointXYZ>::Ptr & cloud)
-  : LandMarkFeature(FEATURE_TYPE_POINT_CLOUD), cloud(cloud) {};
+  : LandMarkFeature(FEATURE_TYPE_POINT_CLOUD), cloud(cloud) {}
 
   // DESCTRUCTOR
   ~PointCloudFeature() override = default;

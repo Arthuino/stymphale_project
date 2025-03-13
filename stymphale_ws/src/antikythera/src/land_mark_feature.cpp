@@ -49,8 +49,8 @@ void LandMarkFeature::print() const
 // ROS serialization methods
 // Convert a LandMarkFeature object to ROS message format
 void LandMarkFeature::toROSMsg(
-  const std::shared_ptr<LandMarkFeature>& landMarkFeature,
-  antikythera_msgs::msg::LandMarkFeature& msg)
+  const std::shared_ptr<LandMarkFeature> & landMarkFeature,
+  antikythera_msgs::msg::LandMarkFeature & msg)
 {
   // Set Feature Type
   msg.feature_type = landMarkFeature->get_feature_type();
@@ -62,8 +62,9 @@ void LandMarkFeature::toROSMsg(
       auto pointCloudFeature = std::dynamic_pointer_cast<PointCloudFeature>(landMarkFeature);
       if (pointCloudFeature) {
           msg.feature_type = FEATURE_TYPE_POINT_CLOUD;
-          auto cloud = std::static_pointer_cast<pcl::PointCloud<pcl::PointXYZ>>(pointCloudFeature->get_feature_data());
-          pcl::toROSMsg(*cloud, msg.point_cloud);  // Convert pcl data to ROS msg
+          auto cloud = std::static_pointer_cast<pcl::PointCloud<pcl::PointXYZ>>(
+                                                          pointCloudFeature->get_feature_data());
+          pcl::toROSMsg(* cloud, msg.point_cloud);  // Convert pcl data to ROS msg
       }
   } else if (msg.feature_type == FEATURE_TYPE_TRANSFORM) {
       msg.is_transform = true;
@@ -76,8 +77,8 @@ void LandMarkFeature::toROSMsg(
 
 // Convert a ROS message to LandMarkFeature object
 void LandMarkFeature::fromROSMsg(
-  const antikythera_msgs::msg::LandMarkFeature& msg,
-  std::shared_ptr<LandMarkFeature>& landMarkFeature)
+  const antikythera_msgs::msg::LandMarkFeature & msg,
+  std::shared_ptr<LandMarkFeature> & landMarkFeature)
 {
   if (msg.is_point_cloud) {  // PointCloud Feature
       // Convert feature object to PointCloudFeature
@@ -85,7 +86,7 @@ void LandMarkFeature::fromROSMsg(
 
       // Convert data to pcl
       auto cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-      pcl::fromROSMsg(msg.point_cloud, *cloud);
+      pcl::fromROSMsg(msg.point_cloud, * cloud);
 
       // Wrap the shared pointer in std::any and pass it to set_feature
       auto feature_data = std::make_shared<std::any>(cloud);

@@ -56,24 +56,23 @@ public:
   // Getters
   [[nodiscard]] int get_id() const noexcept;
   [[nodiscard]] const std::string & get_label() const noexcept;
-  
+
   /*
    * @brief Get all features of a specific type
    * @tparam FeatureType The type of feature to get (e.g. PointCloudFeature)
-   * 
+   *
    * @return A vector of shared pointers to the features of the specified type
    */
-  template<typename FeatureType>  // FeatureType can be PointCloudFeature, etc.
+  template<typename FeatureType>
+  // FeatureType can be PointCloudFeature, etc.
   [[nodiscard]] std::vector<std::shared_ptr<FeatureType>> get_features_object() const noexcept
   {
     std::vector<std::shared_ptr<FeatureType>> specific_features;
 
-    for (const auto & feature : features)
-    {
-        if (auto casted_feature = std::dynamic_pointer_cast<FeatureType>(feature))
-        {
-            specific_features.push_back(casted_feature);
-        }
+    for (const auto & feature : features){
+      if (auto casted_feature = std::dynamic_pointer_cast<FeatureType>(feature)){
+          specific_features.push_back(casted_feature);
+      }
     }
     return specific_features;
   }
