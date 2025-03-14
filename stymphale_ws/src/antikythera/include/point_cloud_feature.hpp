@@ -57,16 +57,12 @@ public:
   // Correctly declare the print function
   void print() const override;
 
-  // getter
-  std::shared_ptr<void> get_feature_data() const override;
-
-  // setter
-  void set_feature_data(const std::shared_ptr<std::any> & feature_data) override;
-
   // ROS CONVERSIONS
   antikythera_msgs::msg::LandMarkFeature toROSMsg() const override;
 
   void fromROSMsg(const antikythera_msgs::msg::LandMarkFeature & msg) override;
+  std::shared_ptr<void> get_feature_data_impl() const override;
+  void set_feature_data_impl(const std::shared_ptr<void> & feature_data) override;
 
 private:
   std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud;

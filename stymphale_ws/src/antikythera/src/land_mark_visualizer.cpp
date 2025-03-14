@@ -85,7 +85,7 @@ private:
 
       // Extract cloud from feature
       auto cloud = std::static_pointer_cast<pcl::PointCloud<pcl::PointXYZ>>(
-        featureObject->get_feature_data());
+        featureObject->get_feature_data<pcl::PointCloud<pcl::PointXYZ>>());
 
       if (!cloud) {
         std::cerr << "Warning: Null point cloud feature data!" << std::endl;

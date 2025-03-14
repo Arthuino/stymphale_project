@@ -65,8 +65,18 @@ public:
   virtual void print() const = 0;  // Print details of the feature
 
   // DATA ACCESS
-  virtual std::shared_ptr<void> get_feature_data() const = 0;
-  virtual void set_feature_data(const std::shared_ptr<std::any> & feature_data) = 0;
+  template<typename T>
+  std::shared_ptr<T> get_feature_data() const
+  {
+    return std::static_pointer_cast<T>(get_feature_data_impl());
+  }
+
+  template<typename T>
+  void set_feature_data(const std::shared_ptr<T> & feature_data)
+  {
+    set_feature_data_impl(std::static_pointer_cast<void>(feature_data));
+  }
+
 
   // FEATURE TYPE ACCESS
   std::string get_feature_type() const {return std::string(feature_type);}
@@ -81,6 +91,8 @@ public:
 
 protected:
   std::string feature_type;
+  virtual std::shared_ptr<void> get_feature_data_impl() const = 0;
+  virtual void set_feature_data_impl(const std::shared_ptr<void> & feature_data) = 0;
 };
 }  // namespace antikythera
 

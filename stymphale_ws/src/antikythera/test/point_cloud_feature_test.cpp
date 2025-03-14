@@ -34,55 +34,62 @@
 
 #include "point_cloud_feature.hpp"
 #include "land_mark_feature.hpp"
+// Antikythera message
+#include "antikythera_msgs/msg/land_mark_object.hpp"
 
 using antikythera::PointCloudFeature;
 using antikythera::LandMarkFeature;
 using LandMarkFeatureMsg = antikythera_msgs::msg::LandMarkFeature;
 
+// HELPER FUNCTIONS
+pcl::PointCloud<pcl::PointXYZ>::Ptr createPointCloud(const std::vector<pcl::PointXYZ> & points)
+{
+  auto cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
+  for (const auto & point : points) {
+    cloud->push_back(point);
+  }
+  return cloud;
+}
+
+void validatePointCloud(
+  const pcl::PointCloud<pcl::PointXYZ>::Ptr & cloud,
+  const std::vector<pcl::PointXYZ> & expectedPoints)
+{
+  ASSERT_NE(cloud, nullptr);
+  EXPECT_EQ(cloud->size(), expectedPoints.size());
+  for (size_t i = 0; i < expectedPoints.size(); ++i) {
+    EXPECT_FLOAT_EQ((*cloud)[i].x, expectedPoints[i].x);
+    EXPECT_FLOAT_EQ((*cloud)[i].y, expectedPoints[i].y);
+    EXPECT_FLOAT_EQ((*cloud)[i].z, expectedPoints[i].z);
+  }
+}
+
+// TESTS
 TEST(PointCloudFeatureTest, ConstructorTest) {
   PointCloudFeature feature;
   EXPECT_EQ(feature.get_feature_type(), antikythera::FEATURE_TYPE_POINT_CLOUD);
 }
 
-TEST(PointCloudFeatureTest, SetFeatureDataInvalidTypeTest) {
+TEST(PointCloudFeatureTest, SetFeatureDataValidTest) {
+  // ARRANGE - Create the feature object
   PointCloudFeature feature;
-  auto invalid_data = std::make_shared<std::any>(std::make_shared<int>(42));
+  auto cloud = createPointCloud({pcl::PointXYZ(1.0, 2.0, 3.0)});
 
-  testing::internal::CaptureStderr();
-  feature.set_feature_data(invalid_data);
-  std::string output = testing::internal::GetCapturedStderr();
-  EXPECT_EQ(output, "Error: input data is not a valid PointCloud pointer!\n");
-}
+  // ACT - Set the feature data
+  feature.set_feature_data(cloud);
 
-TEST(PointCloudFeatureTest, SetFeatureDataValidTypeTest) {
-  // Arrange
-  PointCloudFeature feature;
-  auto cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-  cloud->emplace_back(1.0, 2.0, 3.0);
-  auto feature_data = std::make_shared<std::any>(cloud);
-
-  // Act
-  feature.set_feature_data(feature_data);
-  auto retrieved_any = feature.get_feature_data();
-
-  // Assert
-  auto retrieved_data = std::any_cast<std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>>>(retrieved_any);
-  ASSERT_NE(retrieved_data, nullptr);
-  ASSERT_EQ(retrieved_data->size(), 1);
-
-  const auto& point = retrieved_data->at(0);
-  EXPECT_FLOAT_EQ(point.x, 1.0);
-  EXPECT_FLOAT_EQ(point.y, 2.0);
-  EXPECT_FLOAT_EQ(point.z, 3.0);
+  // ASSERT - Retrieve the feature data and test it
+  auto retrieved_cloud = feature.get_feature_data<pcl::PointCloud<pcl::PointXYZ>>();
+  validatePointCloud(retrieved_cloud, {pcl::PointXYZ(1.0, 2.0, 3.0)});
 }
 
 TEST(PointCloudFeatureTest, PrintTest) {
+  // Create a feature object and set the data
   PointCloudFeature feature;
-  auto cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-  cloud->push_back(pcl::PointXYZ(1.0, 2.0, 3.0));
-  auto feature_data = std::make_shared<std::any>(cloud);
-  feature.set_feature_data(feature_data);
+  auto cloud = createPointCloud({pcl::PointXYZ(1.0, 2.0, 3.0)});
+  feature.set_feature_data(cloud);
 
+  // Capture and verify the printed output
   testing::internal::CaptureStdout();
   feature.print();
   std::string output = testing::internal::GetCapturedStdout();
@@ -90,15 +97,16 @@ TEST(PointCloudFeatureTest, PrintTest) {
 }
 
 TEST(PointCloudFeatureTest, ToROSMsgTest) {
+  // ARRANGE - Create the feature object
   auto feature = std::make_shared<PointCloudFeature>();
-  auto cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
-  cloud->push_back(pcl::PointXYZ(1.0, 2.0, 3.0));
-  auto feature_data = std::make_shared<std::any>(cloud);
-  feature->set_feature_data(feature_data);
+  auto cloud = createPointCloud({pcl::PointXYZ(1.0, 2.0, 3.0)});
+  feature->set_feature_data(cloud);
 
+  // ACT - Convert the feature to a ROS message
   LandMarkFeatureMsg msg;
   msg = feature->toROSMsg();
 
+  // ASSERT - Verify the message contents
   EXPECT_EQ(msg.feature_type, antikythera::FEATURE_TYPE_POINT_CLOUD);
   EXPECT_TRUE(msg.is_point_cloud);
   EXPECT_EQ(msg.point_cloud.width, 1);
@@ -106,26 +114,19 @@ TEST(PointCloudFeatureTest, ToROSMsgTest) {
 }
 
 TEST(PointCloudFeatureTest, FromROSMsgValidTest) {
+  // ARRANGE - Create a ROS message with a point cloud
   LandMarkFeatureMsg msg;
   msg.is_point_cloud = true;
   msg.feature_type = antikythera::FEATURE_TYPE_POINT_CLOUD;
-  pcl::PointCloud<pcl::PointXYZ> cloud;
-  cloud.push_back(pcl::PointXYZ(1.0, 2.0, 3.0));
-  pcl::toROSMsg(cloud, msg.point_cloud);
+  auto cloud = createPointCloud({pcl::PointXYZ(1.0, 2.0, 3.0)});
+  pcl::toROSMsg(*cloud, msg.point_cloud);
 
-  std::shared_ptr<LandMarkFeature> feature;
+  // ACT - Create a feature object from the ROS message
+  std::shared_ptr<LandMarkFeature> feature = std::make_shared<PointCloudFeature>();
   feature->fromROSMsg(msg);
 
-  auto pointCloudFeature = std::dynamic_pointer_cast<PointCloudFeature>(feature);
-  ASSERT_TRUE(pointCloudFeature != nullptr);
-
-  auto feature_data = std::any_cast<std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>>>(
-    pointCloudFeature->get_feature_data()
-  );
-  EXPECT_EQ(feature_data->size(), 1);
-  EXPECT_EQ((*feature_data)[0].x, 1.0);
-  EXPECT_EQ((*feature_data)[0].y, 2.0);
-  EXPECT_EQ((*feature_data)[0].z, 3.0);
+  auto feature_data = feature->get_feature_data<pcl::PointCloud<pcl::PointXYZ>>();
+  validatePointCloud(feature_data, {pcl::PointXYZ(1.0, 2.0, 3.0)});
 }
 
 TEST(PointCloudFeatureTest, FromROSMsgInvalidTest) {
@@ -136,7 +137,7 @@ TEST(PointCloudFeatureTest, FromROSMsgInvalidTest) {
   cloud.push_back(pcl::PointXYZ(1.0, 2.0, 3.0));
   pcl::toROSMsg(cloud, msg.point_cloud);
 
-  std::shared_ptr<LandMarkFeature> feature;
+  std::shared_ptr<LandMarkFeature> feature = std::make_shared<PointCloudFeature>();
   testing::internal::CaptureStderr();
   feature->fromROSMsg(msg);
   std::string output = testing::internal::GetCapturedStderr();

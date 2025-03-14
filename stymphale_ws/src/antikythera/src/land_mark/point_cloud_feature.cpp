@@ -37,23 +37,14 @@ void PointCloudFeature::print() const
 }
 
 // GETTERS
-std::shared_ptr<void> PointCloudFeature::get_feature_data() const
+std::shared_ptr<void> PointCloudFeature::get_feature_data_impl() const
 {
-  return std::make_shared<std::any>(cloud);
+  return std::static_pointer_cast<void>(cloud);
 }
 
-// SETTERS
-void PointCloudFeature::set_feature_data(const std::shared_ptr<std::any>& feature_data) {
-  if (!feature_data) {
-      throw std::invalid_argument("Received null feature_data pointer.");
-  }
-
-  // Use std::any_cast directly on the pointer, avoiding unnecessary dereference
-  if (auto ptr = std::any_cast<std::shared_ptr<pcl::PointCloud<pcl::PointXYZ>>>(feature_data.get())) {
-      cloud = *ptr; // Assign the extracted shared_ptr
-  } else {
-      throw std::invalid_argument("Invalid type for feature_data. Expected shared_ptr<pcl::PointCloud<pcl::PointXYZ>>.");
-  }
+void PointCloudFeature::set_feature_data_impl(const std::shared_ptr<void> & feature_data)
+{
+  cloud = std::static_pointer_cast<pcl::PointCloud<pcl::PointXYZ>>(feature_data);
 }
 
 // ROS CONVERSION
